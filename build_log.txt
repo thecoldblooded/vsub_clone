@@ -1,0 +1,41 @@
+
+> vsub_clone@0.1.0 build
+> next build
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Γû▓ Next.js 16.0.4 (Turbopack)
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+
+> Build error occurred
+Error: Turbopack build failed with 2 errors:
+./app/editor/[id]/page.tsx:1293:26
+Parsing ecmascript source code failed
+  1291 |                             crossOrigin="anonymous"
+  1292 |                             preload="auto"
+> 1293 |                         />
+       |                          ^
+  1294 |
+  1295 |                         {/* Audio Elements */}
+  1296 |                         <audio ref={audioRef} className="hidden" />
+
+Unexpected token. Did you mean `{'>'}` or `&gt;`?
+
+
+./app/editor/[id]/page.tsx:1604:2
+Parsing ecmascript source code failed
+  1602 |         </div>
+  1603 |     </>
+> 1604 | )}
+       |  ^
+  1605 |                     </div >
+  1606 |
+  1607 |     {/* Export Controls (Moved to Left Sidebar Footer) */ }
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+
+    at <unknown> (./app/editor/[id]/page.tsx:1293:26)
+    at <unknown> (./app/editor/[id]/page.tsx:1604:2)
