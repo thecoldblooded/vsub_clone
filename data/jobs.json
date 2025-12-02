@@ -1,5 +1,362 @@
 [
   {
+    "id": "77caf025-5711-46f5-861e-946116e6bfa2",
+    "userId": "user-1",
+    "type": "VIDEO_EXPORT",
+    "status": "GENERATING",
+    "progress": 0,
+    "createdAt": "2025-12-02T19:27:52.522Z",
+    "updatedAt": "2025-12-02T19:27:52.525Z",
+    "metadata": {
+      "originalName": "MY BEST FRIEND BETRAYED ME 😭🤬.mp4"
+    }
+  },
+  {
+    "id": "37503344-381a-4871-a360-30417dbd7d2e",
+    "userId": "user-1",
+    "type": "VIDEO_EXPORT",
+    "status": "COMPLETED",
+    "progress": 100,
+    "createdAt": "2025-12-02T17:50:45.750Z",
+    "updatedAt": "2025-12-02T17:54:23.482Z",
+    "metadata": {
+      "fps": 30,
+      "duration": 43.197874,
+      "format": "mp4",
+      "mode": "overlay",
+      "audioTracks": [
+        {
+          "type": "tts",
+          "startTime": 0,
+          "filename": "tts_0.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 3.130417,
+          "filename": "tts_3.130417.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 5.665167,
+          "filename": "tts_5.665167.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 9.468917000000001,
+          "filename": "tts_9.468917000000001.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 13.173459000000001,
+          "filename": "tts_13.173459000000001.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 16.520667000000003,
+          "filename": "tts_16.520667000000003.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 20.276750000000003,
+          "filename": "tts_20.276750000000003.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 23.911333000000003,
+          "filename": "tts_23.911333000000003.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 27.091875,
+          "filename": "tts_27.091875.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 29.218625000000003,
+          "filename": "tts_29.218625000000003.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 32.684708,
+          "filename": "tts_32.684708.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 37.295041,
+          "filename": "tts_37.295041.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 41.290749,
+          "filename": "tts_41.290749.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 2.0667562142857143,
+          "filename": "sfx_2.0667562142857143.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 10.537097666666668,
+          "filename": "sfx_10.537097666666668.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 14.706571,
+          "filename": "sfx_14.706571.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 18.524410384615386,
+          "filename": "sfx_18.524410384615386.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 22.51573785714286,
+          "filename": "sfx_22.51573785714286.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 24.090035800000003,
+          "filename": "sfx_24.090035800000003.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 28.02144642857143,
+          "filename": "sfx_28.02144642857143.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 33.410060882352944,
+          "filename": "sfx_33.410060882352944.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 35.82790382352941,
+          "filename": "sfx_35.82790382352941.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 37.295041,
+          "filename": "sfx_37.295041.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 41.290749,
+          "filename": "sfx_41.290749.mp3"
+        }
+      ],
+      "width": 1080,
+      "height": 1920,
+      "backgroundVideo": "/uploads/1764697521288-1201.mp4",
+      "backgroundThumbnail": "/uploads/1764697521770-thumbnail.jpg",
+      "projectId": "2c402398-baf6-4fa9-bc71-673b93583556",
+      "originalName": "SHE ONLY WANTED MY ROBUX 😳🤬.mp4",
+      "size": 173571918
+    },
+    "resultUrl": "/videos/job-37503344-381a-4871-a360-30417dbd7d2e.mp4"
+  },
+  {
+    "id": "a2b9d065-ef8c-4601-a478-21f7455842f8",
+    "userId": "user-1",
+    "type": "VIDEO_EXPORT",
+    "status": "COMPLETED",
+    "progress": 100,
+    "createdAt": "2025-12-02T17:38:12.562Z",
+    "updatedAt": "2025-12-02T17:42:09.609Z",
+    "metadata": {
+      "fps": 30,
+      "duration": 51.845624,
+      "format": "mp4",
+      "mode": "overlay",
+      "audioTracks": [
+        {
+          "type": "tts",
+          "startTime": 0,
+          "filename": "tts_0.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 3.41525,
+          "filename": "tts_3.41525.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 5.678917,
+          "filename": "tts_5.678917.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 7.126250000000001,
+          "filename": "tts_7.126250000000001.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 10.159542,
+          "filename": "tts_10.159542.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 14.278375,
+          "filename": "tts_14.278375.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 16.543875,
+          "filename": "tts_16.543875.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 19.8795,
+          "filename": "tts_19.8795.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 21.614583,
+          "filename": "tts_21.614583.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 24.475541,
+          "filename": "tts_24.475541.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 27.336790999999998,
+          "filename": "tts_27.336790999999998.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 30.507374,
+          "filename": "tts_30.507374.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 32.240499,
+          "filename": "tts_32.240499.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 35.003457,
+          "filename": "tts_35.003457.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 37.141957,
+          "filename": "tts_37.141957.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 39.524789999999996,
+          "filename": "tts_39.524789999999996.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 41.573082,
+          "filename": "tts_41.573082.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 43.932249,
+          "filename": "tts_43.932249.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 47.266999,
+          "filename": "tts_47.266999.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 50.397207,
+          "filename": "tts_50.397207.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 2.004234375,
+          "filename": "sfx_2.004234375.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 4.4734502,
+          "filename": "sfx_4.4734502.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 5.678917,
+          "filename": "sfx_5.678917.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 8.815111333333334,
+          "filename": "sfx_8.815111333333334.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 14.866875,
+          "filename": "sfx_14.866875.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 19.8795,
+          "filename": "sfx_19.8795.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 24.475541,
+          "filename": "sfx_24.475541.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 27.336790999999998,
+          "filename": "sfx_27.336790999999998.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 30.507374,
+          "filename": "sfx_30.507374.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 37.97877166666667,
+          "filename": "sfx_37.97877166666667.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 39.718326499999996,
+          "filename": "sfx_39.718326499999996.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 40.1053995,
+          "filename": "sfx_40.1053995.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 41.573082,
+          "filename": "sfx_41.573082.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 44.87716566666666,
+          "filename": "sfx_44.87716566666666.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 48.801287,
+          "filename": "sfx_48.801287.mp3"
+        }
+      ],
+      "width": 1080,
+      "height": 1920,
+      "backgroundVideo": "/uploads/1764696778125-12016.mp4",
+      "backgroundThumbnail": "/uploads/1764696778778-thumbnail.jpg",
+      "projectId": "0c9a7e02-fdac-4930-b87d-f2a07e661453",
+      "originalName": "MY BEST FRIEND STOLE HIM 😭👹.mp4",
+      "size": 205859072
+    },
+    "resultUrl": "/videos/job-a2b9d065-ef8c-4601-a478-21f7455842f8.mp4"
+  },
+  {
     "id": "91dcd17c-7f08-405b-abed-c5d0f91b62b0",
     "userId": "user-1",
     "type": "VIDEO_EXPORT",

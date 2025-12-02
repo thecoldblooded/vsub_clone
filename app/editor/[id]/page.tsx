@@ -1255,7 +1255,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                                     sentenceWords[wIdx] = {
                                         ...sentenceWords[wIdx],
                                         mediaUrl: overlay.mediaUrl,
-                                        mediaType: 'image',
+                                        mediaType: overlay.mediaType || 'image',
                                         soundEffect: overlay.soundEffect || sentenceWords[wIdx].soundEffect
                                     }
                                     updatedCount++
@@ -1360,10 +1360,41 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
 
                 // Display media for current word
                 if (currentWord && currentWord.mediaUrl) {
-                    const img = new Image()
-                    img.src = currentWord.mediaUrl
                     const size = 400
-                    ctx.drawImage(img, (canvas.width - size) / 2, (canvas.height - size) / 2, size, size)
+                    const x = (canvas.width - size) / 2
+                    const y = (canvas.height - size) / 2
+
+                    if (currentWord.mediaType === 'video') {
+                        // Video Overlay Logic
+                        let videoEl = document.getElementById(`overlay-video-${currentWord.id}`) as HTMLVideoElement
+                        if (!videoEl) {
+                            videoEl = document.createElement('video')
+                            videoEl.id = `overlay-video-${currentWord.id}`
+                            videoEl.src = currentWord.mediaUrl
+                            videoEl.crossOrigin = "anonymous"
+                            videoEl.muted = true
+                            videoEl.loop = true
+                            videoEl.style.display = 'none'
+                            document.body.appendChild(videoEl)
+                            videoEl.play().catch(e => console.error("Overlay video play error:", e))
+                        }
+
+                        // Sync video time (optional, but good for loops)
+                        // For simple loops, just letting it play is often enough, 
+                        // but if we want it to restart on word start:
+                        // if (Math.abs(videoEl.currentTime - (timeInSentence % videoEl.duration)) > 0.5) {
+                        //     videoEl.currentTime = timeInSentence % videoEl.duration
+                        // }
+
+                        if (videoEl.readyState >= 2) {
+                            ctx.drawImage(videoEl, x, y, size, size)
+                        }
+                    } else {
+                        // Image Overlay Logic
+                        const img = new Image()
+                        img.src = currentWord.mediaUrl
+                        ctx.drawImage(img, x, y, size, size)
+                    }
                 }
             }
 

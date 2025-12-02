@@ -16,16 +16,24 @@ export async function POST(req: Request) {
 
         const prompt = `
         Analyze the following video script and identify 14 keywords or phrases that would be perfect for a meme overlay.
+        
+        I need exactly:
+        - 7 keywords for STATIC IMAGE memes (JPG).
+        - 7 keywords for ANIMATED VIDEO memes (MP4/GIF).
+        
         For each keyword, provide:
         1. The exact word/phrase from the script.
         2. A search query for imgflip.com to find a relevant meme template.
-        3. A sound effect ID from the provided list. You MUST select a sound effect for every keyword.
+        3. The type of media: "image" or "video".
+        4. A sound effect ID from the provided list. You MUST select a sound effect for every keyword.
+        5. A backup search query (different from the first) in case the first one yields no results.
 
         Script: "${script}"
 
         Available Sound Effects: ${JSON.stringify(availableSounds)}
 
-        Return a JSON array of objects with keys: "word", "searchQuery", "soundEffectId".
+        Return a JSON array of objects with keys: "word", "searchQuery", "backupSearchQuery", "mediaType", "soundEffectId".
+        Ensure the response is valid JSON. Do not include any markdown formatting or comments.
         `;
 
         let url = `https://aiplatform.googleapis.com/v1/publishers/google/models/${modelId}:generateContent`;
@@ -73,32 +81,77 @@ export async function POST(req: Request) {
             suggestions = JSON.parse(cleanText);
             console.log("Parsed Suggestions:", suggestions); // Debug log
         } catch (e) {
-            console.error("Failed to parse Vertex response", text);
-            return NextResponse.json({ error: "Failed to parse suggestions" }, { status: 500 });
+            console.warn("Initial JSON parse failed, attempting repair...", e);
+            try {
+                // Attempt to fix common JSON errors like missing quotes on keys
+                // Fixes: soundEffectId": "val" -> "soundEffectId": "val"
+                const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const repairedText = cleanText.replace(/([{,]\s*)([a-zA-Z0-9_]+)"\s*:/g, '$1"$2":');
+                suggestions = JSON.parse(repairedText);
+                console.log("Parsed Repaired Suggestions:", suggestions);
+            } catch (repairError) {
+                console.error("Failed to parse Vertex response even after repair", text);
+                return NextResponse.json({ error: "Failed to parse suggestions" }, { status: 500 });
+            }
         }
 
         // Now fetch meme URLs
         const overlays = await Promise.all(suggestions.map(async (item: any) => {
-            try {
-                const searchUrl = `https://imgflip.com/search?q=${encodeURIComponent(item.searchQuery)}`;
-                console.log(`Searching Imgflip: ${searchUrl}`); // Debug log
-                const res = await fetch(searchUrl);
-                const html = await res.text();
+            const queries = [item.searchQuery, item.backupSearchQuery].filter(Boolean);
 
-                const match = html.match(/src="\/\/i\.imgflip\.com\/([^"]+)"/);
+            for (const query of queries) {
+                try {
+                    let searchUrl;
+                    if (item.mediaType === 'video') {
+                        // Use specific GIF templates search for videos
+                        searchUrl = `https://imgflip.com/memesearch?q=${encodeURIComponent(query)}&gifs_only=on`;
+                    } else {
+                        // Use general search for images
+                        searchUrl = `https://imgflip.com/search?q=${encodeURIComponent(query)}`;
+                    }
 
-                if (match && match[1]) {
-                    console.log(`Found meme for "${item.word}": https://i.imgflip.com/${match[1]}`); // Debug log
-                    return {
-                        word: item.word,
-                        mediaUrl: `https://i.imgflip.com/${match[1]}`,
-                        soundEffect: item.soundEffectId !== 'none' ? item.soundEffectId : undefined
-                    };
-                } else {
-                    console.warn(`No meme found for "${item.word}" (Query: ${item.searchQuery})`); // Debug log
+                    console.log(`Searching Imgflip (${item.mediaType}) with query "${query}": ${searchUrl}`);
+
+                    const res = await fetch(searchUrl);
+                    const html = await res.text();
+
+                    // Regex to find meme ID from search results
+                    // Matches: href="/meme/123456/Meme-Name" or href="/memetemplate/123456/Meme-Name"
+                    const match = html.match(/href="\/meme(template)?\/(\d+)\/[^"]+"/);
+
+                    if (match && match[2]) {
+                        const id = match[2];
+                        let mediaUrl;
+
+                        if (item.mediaType === 'video') {
+                            // Construct MP4 URL for animated templates
+                            // Imgflip uses base36 IDs for the actual file URL
+                            const base36Id = Number(id).toString(36);
+                            mediaUrl = `https://i.imgflip.com/${base36Id}.mp4`;
+                        } else {
+                            // Construct JPG URL for static templates
+                            // Try to find the src in the search result first
+                            const imgMatch = html.match(new RegExp(`src="//i\\.imgflip\\.com\\/([^"]+)"`));
+                            if (imgMatch && imgMatch[1]) {
+                                mediaUrl = `https://i.imgflip.com/${imgMatch[1]}`;
+                            } else {
+                                mediaUrl = `https://i.imgflip.com/${id}.jpg`;
+                            }
+                        }
+
+                        console.log(`Found ${item.mediaType} for "${item.word}": ${mediaUrl}`);
+                        return {
+                            word: item.word,
+                            mediaUrl: mediaUrl,
+                            mediaType: item.mediaType,
+                            soundEffect: item.soundEffectId !== 'none' ? item.soundEffectId : undefined
+                        };
+                    } else {
+                        console.warn(`No meme found for "${item.word}" (Query: ${query})`);
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch meme for", item.word, e);
                 }
-            } catch (e) {
-                console.error("Failed to fetch meme for", item.word, e);
             }
             return null;
         }));
