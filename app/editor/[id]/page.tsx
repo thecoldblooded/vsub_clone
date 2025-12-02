@@ -549,9 +549,9 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             console.log(`Generating ${totalFrames} overlay frames...`)
             const zip = new JSZip()
 
-            // Preload images
-            console.log("Preloading images...")
-            const imageCache = new Map<string, HTMLImageElement | HTMLVideoElement>()
+            // Preload images and cache video frames
+            console.log("Preloading images and caching video frames...")
+            const imageCache = new Map<string, HTMLImageElement | ImageBitmap[]>()
             const uniqueMediaUrls = new Set<string>()
 
             console.log("Checking sentences for media URLs:", project.sentences.length, "sentences")
@@ -587,17 +587,77 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                     }
 
                     if (type === 'video') {
+                        console.log(`Downloading video for extraction: ${url}`)
+                        // Fetch as blob to ensure it's fully loaded and seekable
+                        const response = await fetch(proxiedUrl)
+                        const blob = await response.blob()
+                        const objectUrl = URL.createObjectURL(blob)
+
+                        console.log(`Extracting frames from blob: ${url}`)
                         const video = document.createElement('video')
-                        video.crossOrigin = "anonymous"
+                        // video.crossOrigin = "anonymous" // Not needed for Blob URL
                         video.muted = true
                         video.preload = "auto"
-                        video.src = proxiedUrl
+                        video.src = objectUrl
+
                         await new Promise((resolve, reject) => {
                             video.onloadedmetadata = resolve
                             video.onerror = reject
                         })
-                        imageCache.set(url, video)
-                        console.log(`✓ Loaded video: ${url}`)
+
+                        // Extract frames
+                        const frames: ImageBitmap[] = []
+                        const fps = 30
+                        const duration = video.duration || 1
+                        const totalFrames = Math.ceil(duration * fps)
+
+                        // Create a temporary canvas for frame extraction
+                        const tempCanvas = document.createElement('canvas')
+                        tempCanvas.width = video.videoWidth
+                        tempCanvas.height = video.videoHeight
+                        const tempCtx = tempCanvas.getContext('2d')
+
+                        // Hack: Attach to DOM to ensure reliable rendering in some browsers
+                        video.style.position = 'fixed'
+                        video.style.opacity = '0'
+                        video.style.pointerEvents = 'none'
+                        document.body.appendChild(video)
+
+                        if (tempCtx) {
+                            for (let i = 0; i < totalFrames; i++) {
+                                const time = i / fps
+                                video.currentTime = time
+
+                                await new Promise<void>(resolve => {
+                                    const onSeeked = () => {
+                                        video.removeEventListener('seeked', onSeeked)
+                                        // Small delay to ensure frame is decoded and ready on GPU
+                                        setTimeout(resolve, 50)
+                                    }
+
+                                    // Always wait for seeked event to be safe, unless we are at 0 and already there
+                                    if (i === 0 && video.currentTime === 0 && video.readyState >= 2) {
+                                        resolve()
+                                    } else {
+                                        video.addEventListener('seeked', onSeeked)
+                                    }
+                                })
+
+                                tempCtx.drawImage(video, 0, 0)
+                                const bitmap = await createImageBitmap(tempCanvas)
+                                frames.push(bitmap)
+
+                                // Progress log every 30 frames
+                                if (i % 30 === 0) console.log(`  Extracted frame ${i}/${totalFrames} for ${url.slice(-20)}`)
+                            }
+                        }
+
+                        // Cleanup
+                        document.body.removeChild(video)
+                        URL.revokeObjectURL(objectUrl)
+
+                        imageCache.set(url, frames)
+                        console.log(`✓ Extracted ${frames.length} frames for: ${url}`)
                     } else {
                         const img = await new Promise<HTMLImageElement>((resolve, reject) => {
                             const image = new Image()
@@ -695,9 +755,9 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             })
 
             for (let i = 0; i < totalFrames; i += CONCURRENCY) {
-                const batchPromises = []
+                const batchPromises: Promise<void>[] = []
                 for (let j = 0; j < CONCURRENCY && i + j < totalFrames; j++) {
-                    batchPromises.push((async () => {
+                    const task = (async () => {
                         const frameIdx = i + j
                         const exportTime = frameIdx * frameDuration
 
@@ -754,17 +814,28 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                                     if (timeSinceWordStart >= 0 && timeSinceWordStart <= 3.0) {
                                         const media = imageCache.get(word.mediaUrl)
                                         if (media) {
-                                            let w, h
-                                            if (media instanceof HTMLVideoElement) {
-                                                w = media.videoWidth || media.width
-                                                h = media.videoHeight || media.height
-                                                try { media.currentTime = timeSinceWordStart % media.duration } catch (e) { }
+                                            let w, h, drawMedia
+
+                                            if (Array.isArray(media)) {
+                                                // It's a cached video (ImageBitmap[])
+                                                // Calculate which frame to show
+                                                const fps = 30
+                                                const frameIndex = Math.floor(timeSinceWordStart * fps) % media.length
+                                                const frame = media[frameIndex]
+
+                                                if (frame) {
+                                                    w = frame.width
+                                                    h = frame.height
+                                                    drawMedia = frame
+                                                }
                                             } else {
+                                                // It's an image (HTMLImageElement)
                                                 w = media.naturalWidth || media.width
                                                 h = media.naturalHeight || media.height
+                                                drawMedia = media
                                             }
 
-                                            if (w && h) {
+                                            if (w && h && drawMedia) {
                                                 // GÖRSEL AYARLARI:
                                                 const maxWidth = canvas.width * 0.8
                                                 const maxHeight = canvas.height * 0.55
@@ -785,7 +856,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                                                     console.log(`[Export Debug] Frame: ${frameIdx}, Canvas: ${canvas.width}x${canvas.height}, Image: ${w}x${h}, Final: ${finalW}x${finalH}, Pos: ${imgX},${imgY}`);
                                                 }
 
-                                                ctx.drawImage(media, imgX, imgY, finalW, finalH)
+                                                ctx.drawImage(drawMedia, imgX, imgY, finalW, finalH)
                                             }
                                         }
                                     }
@@ -865,7 +936,8 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                         // Canvas cleanup
                         canvas.width = 0;
                         canvas.height = 0;
-                    })())
+                    })()
+                    batchPromises.push(task)
                 }
 
                 await Promise.all(batchPromises)
