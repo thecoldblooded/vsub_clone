@@ -17,14 +17,15 @@ export async function POST(req: Request) {
         const prompt = `
         Analyze the following video script line by line.
         
-        For EACH line of the script, I need you to identify:
-        1. At least one keyword/phrase for a VISUAL overlay (Image or Video).
-        2. At least one keyword/phrase for a SOUND overlay.
+        For EACH line of the script, I need you to identify EXACTLY ONE overlay consisting of:
+        1. ONE keyword/phrase for a VISUAL overlay (Image or Video).
+        2. ONE keyword/phrase for a SOUND overlay.
 
         Rules:
-        - There is NO fixed limit on the total number of overlays. The number of overlays should scale with the script length.
+        - Generate EXACTLY one overlay per line - no more, no less.
         - Ensure a roughly 50/50 split between STATIC IMAGE memes (JPG) and ANIMATED VIDEO memes (MP4/GIF) across the entire script.
-        - Every single line of the script MUST have at least one visual overlay and one sound overlay.
+        - Every single line MUST have exactly one visual overlay and one sound overlay.
+        - Choose the most impactful/funny moment in each line for the overlay.
         
         For each identified keyword, provide:
         1. The exact word/phrase from the script.

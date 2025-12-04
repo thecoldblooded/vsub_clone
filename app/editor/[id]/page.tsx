@@ -137,6 +137,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
 
     const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved')
     const [isAiProcessing, setIsAiProcessing] = useState(false)
+    const [generatingWordId, setGeneratingWordId] = useState<string | null>(null)
     const router = useRouter()
     const { error: showError, success, info } = useToast()
 
@@ -1279,6 +1280,44 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
         }
     }
 
+    const handleGenerateWordOverlay = async (sentenceId: string, wordId: string, wordText: string) => {
+        if (!project) return
+
+        setGeneratingWordId(wordId)
+        try {
+            const res = await fetch('/api/ai-overlays', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    script: wordText,
+                    availableSounds: SOUND_EFFECTS.filter(s => s.id !== 'none')
+                })
+            })
+
+            if (res.ok) {
+                const data = await res.json()
+                if (data.overlays && data.overlays.length > 0) {
+                    const overlay = data.overlays[0]
+                    updateWord(sentenceId, wordId, {
+                        mediaUrl: overlay.mediaUrl,
+                        mediaType: overlay.mediaType || 'image',
+                        soundEffect: overlay.soundEffect
+                    })
+                    success(`Generated overlay for "${wordText}"!`)
+                } else {
+                    info(`No overlay found for "${wordText}"`)
+                }
+            } else {
+                showError("Failed to generate overlay")
+            }
+        } catch (e) {
+            console.error("Generate overlay error:", e)
+            showError("An error occurred")
+        } finally {
+            setGeneratingWordId(null)
+        }
+    }
+
     const handleAiMagic = async () => {
         if (!project) return
         setIsAiProcessing(true)
@@ -1842,6 +1881,26 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                                                                                 </div>
                                                                             </div>
 
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                className="w-full bg-purple-500/10 border-purple-500/20 text-purple-600 hover:bg-purple-500/20 hover:text-purple-500 text-xs gap-2"
+                                                                                onClick={() => handleGenerateWordOverlay(sentence.id, word.id, word.displayText)}
+                                                                                disabled={generatingWordId === word.id}
+                                                                            >
+                                                                                {generatingWordId === word.id ? (
+                                                                                    <>
+                                                                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                                                                        Generating...
+                                                                                    </>
+                                                                                ) : (
+                                                                                    <>
+                                                                                        <Sparkles className="w-3 h-3" />
+                                                                                        Generate with AI
+                                                                                    </>
+                                                                                )}
+                                                                            </Button>
+
 
                                                                             <Button
                                                                                 variant="outline"
@@ -2327,6 +2386,26 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="w-full bg-purple-500/10 border-purple-500/20 text-purple-600 hover:bg-purple-500/20 hover:text-purple-500 text-xs gap-2"
+                                                onClick={() => handleGenerateWordOverlay(project.sentences[currentSentenceIndex].id, word.id, word.displayText)}
+                                                disabled={generatingWordId === word.id}
+                                            >
+                                                {generatingWordId === word.id ? (
+                                                    <>
+                                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                                        Generating...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Sparkles className="w-3 h-3" />
+                                                        Generate with AI
+                                                    </>
+                                                )}
+                                            </Button>
 
 
                                             <Button
