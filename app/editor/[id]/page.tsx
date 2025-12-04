@@ -133,6 +133,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
     const [isExporting, setIsExporting] = useState(false)
     const [exportProgress, setExportProgress] = useState(0)
     const [exportDetails, setExportDetails] = useState({ frame: 0, totalFrames: 0, time: 0, totalTime: 0 })
+    const [exportPhase, setExportPhase] = useState<'preloading' | 'generating' | 'zipping' | 'uploading'>('preloading')
 
     const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved')
     const [isAiProcessing, setIsAiProcessing] = useState(false)
@@ -502,6 +503,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
         setIsExporting(true)
         setExportProgress(0)
         setExportDetails({ frame: 0, totalFrames: 0, time: 0, totalTime: 0 })
+        setExportPhase('preloading')
 
         let jobId: string | null = null
 
@@ -690,6 +692,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             }
 
             // Export Loop - Concurrent Batch Processing
+            setExportPhase('generating')
             setExportDetails({ frame: 0, totalFrames, time: 0, totalTime: exportDuration })
 
             // Pre-calculate text layouts for all sentences
@@ -1031,6 +1034,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             sfxTracks.forEach(t => zip.file(`sfx_${t.startTime}.mp3`, t.blob))
 
             console.log("Zipping...")
+            setExportPhase('zipping')
             setExportProgress(85)
 
             const content = await zip.generateAsync({
@@ -1043,6 +1047,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             })
 
             // Upload to Job
+            setExportPhase('uploading')
             const formData = new FormData()
             formData.append('file', content, 'project.zip')
             formData.append('originalName', `${videoTitle}.mp4`)
@@ -1837,24 +1842,22 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                                                                                 </div>
                                                                             </div>
 
-                                                                            <div className="space-y-2">
-                                                                                <Label className="text-xs text-muted-foreground">Display text</Label>
-                                                                                <div className="flex gap-2">
-                                                                                    <Input
-                                                                                        value={word.displayText}
-                                                                                        onChange={(e) => updateWord(sentence.id, word.id, { displayText: e.target.value })}
-                                                                                        className="h-8 bg-background/50 text-xs"
-                                                                                    />
-                                                                                    <div className="flex items-center gap-2 bg-background/50 px-2 rounded border border-border/50">
-                                                                                        <Label className="text-[10px] whitespace-nowrap">Line break</Label>
-                                                                                        <Switch
-                                                                                            className="scale-75"
-                                                                                            checked={word.isLineBreak}
-                                                                                            onCheckedChange={(checked) => updateWord(sentence.id, word.id, { isLineBreak: checked })}
-                                                                                        />
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
+
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                className="w-full bg-red-500/10 border-red-500/20 text-red-600 hover:bg-red-500/20 hover:text-red-500 text-xs gap-2"
+                                                                                onClick={() => {
+                                                                                    updateWord(sentence.id, word.id, {
+                                                                                        soundEffect: 'none',
+                                                                                        mediaUrl: undefined,
+                                                                                        mediaType: undefined
+                                                                                    })
+                                                                                }}
+                                                                            >
+                                                                                <Trash2 className="w-3 h-3" />
+                                                                                Clear Overlays
+                                                                            </Button>
                                                                         </div>
                                                                     </PopoverContent>
                                                                 </Popover >
@@ -2115,10 +2118,13 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                                                 <div className="flex items-center gap-2 w-full">
                                                     <Loader2 className="w-4 h-4 animate-spin" />
                                                     <span className="font-medium">
-                                                        {exportProgress < 80 ? 'Generating Frames' : exportProgress < 95 ? 'Zipping' : 'Uploading'} {exportProgress}%
+                                                        {exportPhase === 'preloading' ? 'Overlay dosyaları indiriliyor...' :
+                                                            exportPhase === 'generating' ? `Generating Frames ${exportProgress}%` :
+                                                                exportPhase === 'zipping' ? `Zipping ${exportProgress}%` :
+                                                                    `Uploading ${exportProgress}%`}
                                                     </span>
                                                 </div>
-                                                {exportDetails.totalFrames > 0 && exportProgress < 80 && (
+                                                {exportDetails.totalFrames > 0 && exportPhase === 'generating' && (
                                                     <span className="text-[10px] text-muted-foreground pl-6">
                                                         Frame {exportDetails.frame}/{exportDetails.totalFrames} • {exportDetails.time.toFixed(1)}s / {exportDetails.totalTime.toFixed(1)}s
                                                     </span>
@@ -2322,24 +2328,22 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-2">
-                                                <Label className="text-xs text-muted-foreground">Display text</Label>
-                                                <div className="flex gap-2">
-                                                    <Input
-                                                        value={word.displayText}
-                                                        onChange={(e) => updateWord(project.sentences[currentSentenceIndex].id, word.id, { displayText: e.target.value })}
-                                                        className="h-8 bg-background/50"
-                                                    />
-                                                    <div className="flex items-center gap-2 bg-background/50 px-2 rounded border border-border/50">
-                                                        <Label className="text-[10px] whitespace-nowrap">Line break</Label>
-                                                        <Switch
-                                                            className="scale-75"
-                                                            checked={word.isLineBreak}
-                                                            onCheckedChange={(checked) => updateWord(project.sentences[currentSentenceIndex].id, word.id, { isLineBreak: checked })}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
+
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="w-full bg-red-500/10 border-red-500/20 text-red-600 hover:bg-red-500/20 hover:text-red-500 text-xs gap-2"
+                                                onClick={() => {
+                                                    updateWord(project.sentences[currentSentenceIndex].id, word.id, {
+                                                        soundEffect: 'none',
+                                                        mediaUrl: undefined,
+                                                        mediaType: undefined
+                                                    })
+                                                }}
+                                            >
+                                                <Trash2 className="w-3 h-3" />
+                                                Clear Overlays
+                                            </Button>
                                         </div>
                                     </PopoverContent>
                                 </Popover>

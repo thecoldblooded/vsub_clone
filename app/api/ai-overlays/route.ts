@@ -15,13 +15,18 @@ export async function POST(req: Request) {
         const apiKey = process.env.GEMINI_API_KEY;
 
         const prompt = `
-        Analyze the following video script and identify 14 keywords or phrases that would be perfect for a meme overlay.
+        Analyze the following video script line by line.
         
-        I need exactly:
-        - 7 keywords for STATIC IMAGE memes (JPG).
-        - 7 keywords for ANIMATED VIDEO memes (MP4/GIF).
+        For EACH line of the script, I need you to identify:
+        1. At least one keyword/phrase for a VISUAL overlay (Image or Video).
+        2. At least one keyword/phrase for a SOUND overlay.
+
+        Rules:
+        - There is NO fixed limit on the total number of overlays. The number of overlays should scale with the script length.
+        - Ensure a roughly 50/50 split between STATIC IMAGE memes (JPG) and ANIMATED VIDEO memes (MP4/GIF) across the entire script.
+        - Every single line of the script MUST have at least one visual overlay and one sound overlay.
         
-        For each keyword, provide:
+        For each identified keyword, provide:
         1. The exact word/phrase from the script.
         2. A search query for imgflip.com to find a relevant meme template.
         3. The type of media: "image" or "video".

@@ -1,1 +1,522 @@
-[]
+[
+  {
+    "id": "f4738775-e6ae-462e-84c5-ef023d2ef73e",
+    "userId": "user-1",
+    "type": "VIDEO_EXPORT",
+    "status": "COMPLETED",
+    "progress": 100,
+    "createdAt": "2025-12-04T06:40:30.493Z",
+    "updatedAt": "2025-12-04T06:45:40.356Z",
+    "metadata": {
+      "fps": 30,
+      "duration": 43.09733200000001,
+      "format": "mp4",
+      "mode": "overlay",
+      "audioTracks": [
+        {
+          "type": "tts",
+          "startTime": 0,
+          "filename": "tts_0.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 2.048583,
+          "filename": "tts_2.048583.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 5.775333,
+          "filename": "tts_5.775333.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 9.013333,
+          "filename": "tts_9.013333.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 12.786249999999999,
+          "filename": "tts_12.786249999999999.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 15.546707999999999,
+          "filename": "tts_15.546707999999999.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 17.471916,
+          "filename": "tts_17.471916.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 23.764999,
+          "filename": "tts_23.764999.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 26.745916,
+          "filename": "tts_26.745916.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 29.612874,
+          "filename": "tts_29.612874.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 32.299832,
+          "filename": "tts_32.299832.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 35.117124000000004,
+          "filename": "tts_35.117124000000004.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 37.601082000000005,
+          "filename": "tts_37.601082000000005.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 39.547374000000005,
+          "filename": "tts_39.547374000000005.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 0.6194332,
+          "filename": "sfx_0.6194332.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 4.379013555555556,
+          "filename": "sfx_4.379013555555556.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 7.144333,
+          "filename": "sfx_7.144333.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 11.413472133333332,
+          "filename": "sfx_11.413472133333332.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 13.655656923076922,
+          "filename": "sfx_13.655656923076922.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 15.689228799999999,
+          "filename": "sfx_15.689228799999999.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 19.188385037037037,
+          "filename": "sfx_19.188385037037037.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 23.764999,
+          "filename": "sfx_23.764999.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 27.838358153846155,
+          "filename": "sfx_27.838358153846155.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 30.34186,
+          "filename": "sfx_30.34186.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 33.07226266666667,
+          "filename": "sfx_33.07226266666667.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 35.117124000000004,
+          "filename": "sfx_35.117124000000004.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 38.50501450000001,
+          "filename": "sfx_38.50501450000001.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 40.462361400000006,
+          "filename": "sfx_40.462361400000006.mp3"
+        }
+      ],
+      "width": 1080,
+      "height": 1920,
+      "backgroundVideo": "/uploads/1764830047538-120222.mp4",
+      "backgroundThumbnail": "/uploads/1764830048220-thumbnail.jpg",
+      "projectId": "96d5ac8f-cf6c-4d83-9434-58125ea68a83",
+      "originalName": "MY WHOLE LIFE WAS A LIE 🤯🥺.mp4",
+      "size": 188051656
+    },
+    "resultUrl": "/videos/job-f4738775-e6ae-462e-84c5-ef023d2ef73e.mp4"
+  },
+  {
+    "id": "8c20fc06-53bd-4970-8736-dd1768d05747",
+    "userId": "user-1",
+    "type": "VIDEO_EXPORT",
+    "status": "COMPLETED",
+    "progress": 100,
+    "createdAt": "2025-12-03T10:48:34.084Z",
+    "updatedAt": "2025-12-03T10:55:08.445Z",
+    "metadata": {
+      "fps": 30,
+      "duration": 44.58745699999999,
+      "format": "mp4",
+      "mode": "overlay",
+      "audioTracks": [
+        {
+          "type": "tts",
+          "startTime": 0,
+          "filename": "tts_0.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 1.5,
+          "filename": "tts_1.5.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 4.534333,
+          "filename": "tts_4.534333.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 7.9183330000000005,
+          "filename": "tts_7.9183330000000005.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 12.400375,
+          "filename": "tts_12.400375.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 15.134583000000001,
+          "filename": "tts_15.134583000000001.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 17.392458,
+          "filename": "tts_17.392458.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 22.193291000000002,
+          "filename": "tts_22.193291000000002.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 27.065833,
+          "filename": "tts_27.065833.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 31.050916,
+          "filename": "tts_31.050916.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 34.732749,
+          "filename": "tts_34.732749.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 37.468748999999995,
+          "filename": "tts_37.468748999999995.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 41.04058199999999,
+          "filename": "tts_41.04058199999999.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 3.3431512727272725,
+          "filename": "sfx_3.3431512727272725.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 5.976333,
+          "filename": "sfx_5.976333.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 11.176367363636363,
+          "filename": "sfx_11.176367363636363.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 13.517479,
+          "filename": "sfx_13.517479.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 16.572844363636364,
+          "filename": "sfx_16.572844363636364.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 20.259680000000003,
+          "filename": "sfx_20.259680000000003.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 25.254070400000003,
+          "filename": "sfx_25.254070400000003.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 27.259448722222224,
+          "filename": "sfx_27.259448722222224.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 28.61475877777778,
+          "filename": "sfx_28.61475877777778.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 31.238082647058825,
+          "filename": "sfx_31.238082647058825.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 34.045582352941175,
+          "filename": "sfx_34.045582352941175.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 39.51663766666666,
+          "filename": "sfx_39.51663766666666.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 41.04058199999999,
+          "filename": "sfx_41.04058199999999.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 42.99928735714285,
+          "filename": "sfx_42.99928735714285.mp3"
+        }
+      ],
+      "width": 1080,
+      "height": 1920,
+      "backgroundVideo": "/uploads/1764758371765-120220.mp4",
+      "backgroundThumbnail": "/uploads/1764758372265-thumbnail.jpg",
+      "projectId": "0e55d6ef-ae75-4364-b039-c42c5d9a83cf",
+      "originalName": "SHE PRETENDED TO BE ME 😩🥴.mp4",
+      "size": 179875400
+    },
+    "resultUrl": "/videos/job-8c20fc06-53bd-4970-8736-dd1768d05747.mp4"
+  },
+  {
+    "id": "1e33c8a5-346c-489a-aae3-9d2a2cb52275",
+    "userId": "user-1",
+    "type": "VIDEO_EXPORT",
+    "status": "COMPLETED",
+    "progress": 100,
+    "createdAt": "2025-12-03T10:26:27.742Z",
+    "updatedAt": "2025-12-03T10:35:48.432Z",
+    "metadata": {
+      "fps": 30,
+      "duration": 58.57033399999999,
+      "format": "mp4",
+      "mode": "overlay",
+      "audioTracks": [
+        {
+          "type": "tts",
+          "startTime": 0,
+          "filename": "tts_0.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 4.525417,
+          "filename": "tts_4.525417.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 7.945209,
+          "filename": "tts_7.945209.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 10.118792,
+          "filename": "tts_10.118792.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 13.490666999999998,
+          "filename": "tts_13.490666999999998.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 18.179584,
+          "filename": "tts_18.179584.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 19.485875999999998,
+          "filename": "tts_19.485875999999998.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 25.233458999999996,
+          "filename": "tts_25.233458999999996.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 27.835916999999995,
+          "filename": "tts_27.835916999999995.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 31.232458999999995,
+          "filename": "tts_31.232458999999995.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 34.17466699999999,
+          "filename": "tts_34.17466699999999.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 36.65812499999999,
+          "filename": "tts_36.65812499999999.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 40.53474999999999,
+          "filename": "tts_40.53474999999999.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 44.290874999999986,
+          "filename": "tts_44.290874999999986.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 48.23874999999998,
+          "filename": "tts_48.23874999999998.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 51.32441699999998,
+          "filename": "tts_51.32441699999998.mp3"
+        },
+        {
+          "type": "tts",
+          "startTime": 54.958958999999986,
+          "filename": "tts_54.958958999999986.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 1.3418056666666667,
+          "filename": "sfx_1.3418056666666667.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 5.255365,
+          "filename": "sfx_5.255365.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 11.554729499999999,
+          "filename": "sfx_11.554729499999999.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 14.81348289473684,
+          "filename": "sfx_14.81348289473684.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 18.3408424,
+          "filename": "sfx_18.3408424.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 20.535392599999998,
+          "filename": "sfx_20.535392599999998.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 26.915425399999997,
+          "filename": "sfx_26.915425399999997.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 27.835916999999995,
+          "filename": "sfx_27.835916999999995.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 31.676496818181814,
+          "filename": "sfx_31.676496818181814.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 32.78659136363636,
+          "filename": "sfx_32.78659136363636.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 35.36474179999999,
+          "filename": "sfx_35.36474179999999.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 40.53474999999999,
+          "filename": "sfx_40.53474999999999.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 42.976843749999986,
+          "filename": "sfx_42.976843749999986.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 45.15284374999999,
+          "filename": "sfx_45.15284374999999.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 51.32441699999998,
+          "filename": "sfx_51.32441699999998.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 53.253365923076906,
+          "filename": "sfx_53.253365923076906.mp3"
+        },
+        {
+          "type": "sfx",
+          "startTime": 57.033208999999985,
+          "filename": "sfx_57.033208999999985.mp3"
+        }
+      ],
+      "width": 1080,
+      "height": 1920,
+      "backgroundVideo": "/uploads/1764756848502-120225.mp4",
+      "backgroundThumbnail": "/uploads/1764756849338-thumbnail.jpg",
+      "projectId": "bff8a16b-96eb-47b2-858d-e606a454ae8d",
+      "originalName": "I SENT MY CRUSH EVERYTHING 😭🫢.mp4",
+      "size": 202222631
+    },
+    "resultUrl": "/videos/job-1e33c8a5-346c-489a-aae3-9d2a2cb52275.mp4"
+  }
+]
