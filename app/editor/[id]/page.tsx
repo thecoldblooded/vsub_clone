@@ -68,6 +68,7 @@ interface CaptionSettings {
     shadowSize: number
     hasBackground: boolean
     paddingTop: number
+    swapPosition?: boolean
 }
 
 interface TimelineItem {
@@ -171,7 +172,8 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
         shadowColor: '#000000',
         shadowSize: 4,
         hasBackground: false,
-        paddingTop: 80
+        paddingTop: 80,
+        swapPosition: false
     })
 
     // Load project from API
@@ -852,8 +854,15 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                                                 // Yatay: (Canvas Genişliği - Resim Genişliği) / 2
                                                 const imgX = (canvas.width - finalW) / 2
 
-                                                // Dikey: Merkezden %15 yukarı
-                                                const imgY = (canvas.height / 2) - (finalH / 2) - (canvas.height * 0.15)
+                                                // Dikey: Swap Position kontrolü
+                                                let imgY
+                                                if (captionSettings.swapPosition) {
+                                                    // Swap Mode: Image at Bottom (approx 75% down)
+                                                    imgY = (canvas.height * 0.75) - (finalH / 2)
+                                                } else {
+                                                    // Default: Image Center-ish (shifted up 15%)
+                                                    imgY = (canvas.height / 2) - (finalH / 2) - (canvas.height * 0.15)
+                                                }
 
                                                 // Debug Log (Only for first few frames to reduce noise)
                                                 if (frameIdx < 5) {
@@ -880,7 +889,9 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                                 ctx.textBaseline = "middle"
 
                                 const lineHeight = fontSize * 1.3
-                                const startY = canvas.height * 0.85
+                                const startY = captionSettings.swapPosition
+                                    ? canvas.height * 0.15 // Top
+                                    : canvas.height * 0.85 // Bottom (Default)
 
                                 const currentWordIndex = Math.floor(timeInSentence / wordDuration)
                                 const currentWord = currentSentence.words[currentWordIndex]
@@ -1477,8 +1488,17 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                 // Display media for current word
                 if (currentWord && currentWord.mediaUrl) {
                     const size = 400
+
                     const x = (canvas.width - size) / 2
-                    const y = (canvas.height - size) / 2
+
+                    let y
+                    if (captionSettings.swapPosition) {
+                        // Bottom
+                        y = (canvas.height * 0.75) - (size / 2)
+                    } else {
+                        // Center
+                        y = (canvas.height - size) / 2
+                    }
 
                     if (currentWord.mediaType === 'video') {
                         // Video Overlay Logic
@@ -1525,8 +1545,14 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                 ctx.textBaseline = "middle"
 
                 // Multi-line text wrapping
+                // Multi-line text wrapping
                 const xPos = canvas.width / 2
-                const yPos = (captionSettings.paddingTop / 100) * canvas.height
+                let yPos
+                if (captionSettings.swapPosition) {
+                    yPos = canvas.height * 0.15
+                } else {
+                    yPos = (captionSettings.paddingTop / 100) * canvas.height
+                }
 
                 const words = currentSentence.words.map(w => {
                     let t = w.displayText
@@ -2157,6 +2183,19 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                                                     onValueChange={(vals) => setCaptionSettings({ ...captionSettings, paddingTop: vals[0] })}
                                                 />
                                             </div>
+
+
+                                            {/* Swap Position Toggle */}
+                                            <div className="flex items-center justify-between pt-4 border-t border-border/30">
+                                                <div className="flex flex-col gap-0.5">
+                                                    <Label className="text-xs">Swap Position</Label>
+                                                    <span className="text-[10px] text-muted-foreground">Text Top / Media Bottom</span>
+                                                </div>
+                                                <Switch
+                                                    checked={captionSettings.swapPosition || false}
+                                                    onCheckedChange={(checked) => setCaptionSettings({ ...captionSettings, swapPosition: checked })}
+                                                />
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -2278,7 +2317,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                             }
 
                             return (
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ paddingBottom: '25%' }}>
+                                <div className={`absolute inset-0 flex justify-center pointer-events-none ${captionSettings.swapPosition ? 'items-end' : 'items-center'}`} style={{ paddingBottom: captionSettings.swapPosition ? '15%' : '25%' }}>
                                     {activeMediaType === 'video' ? (
                                         <video
                                             src={activeMediaUrl}
@@ -2302,7 +2341,8 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                         <div
                             className="absolute left-0 right-0 text-center px-4 flex flex-wrap justify-center content-end gap-2"
                             style={{
-                                bottom: '15%',
+                                bottom: captionSettings.swapPosition ? 'auto' : '15%',
+                                top: captionSettings.swapPosition ? '15%' : 'auto',
                                 pointerEvents: 'auto'
                             }}
                         >
