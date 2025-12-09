@@ -38,8 +38,8 @@ export async function POST(req: Request) {
 
         Available Sound Effects: ${JSON.stringify(availableSounds)}
 
-        Return a JSON array of objects with keys: "word", "searchQuery", "backupSearchQuery", "mediaType", "soundEffectId".
-        Ensure the response is valid JSON. Do not include any markdown formatting or comments.
+        Return ONLY a raw JSON array of objects. Do not use markdown code blocks. Do not add any explanation.
+        Keys: "word", "searchQuery", "backupSearchQuery", "mediaType", "soundEffectId".
         `;
 
         let url = `https://aiplatform.googleapis.com/v1/publishers/google/models/${modelId}:generateContent`;
@@ -82,16 +82,29 @@ export async function POST(req: Request) {
 
         let suggestions = [];
         try {
-            // Clean up markdown code blocks if present
-            const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+            // Robust JSON extraction
+            let cleanText = text.trim();
+            // Remove markdown code blocks if present
+            cleanText = cleanText.replace(/```json/g, '').replace(/```/g, '');
+
+            // Finds the first '[' and last ']' to extract just the array
+            const firstBracket = cleanText.indexOf('[');
+            const lastBracket = cleanText.lastIndexOf(']');
+
+            if (firstBracket !== -1 && lastBracket !== -1) {
+                cleanText = cleanText.substring(firstBracket, lastBracket + 1);
+            }
+
             suggestions = JSON.parse(cleanText);
             console.log("Parsed Suggestions:", suggestions); // Debug log
         } catch (e) {
             console.warn("Initial JSON parse failed, attempting repair...", e);
+            console.log("Raw Text:", text);
             try {
                 // Attempt to fix common JSON errors like missing quotes on keys
                 // Fixes: soundEffectId": "val" -> "soundEffectId": "val"
                 const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                // Simple repair for keys missing leading quote if they have trailing quote
                 const repairedText = cleanText.replace(/([{,]\s*)([a-zA-Z0-9_]+)"\s*:/g, '$1"$2":');
                 suggestions = JSON.parse(repairedText);
                 console.log("Parsed Repaired Suggestions:", suggestions);
