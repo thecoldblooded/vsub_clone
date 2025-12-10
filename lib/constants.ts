@@ -1,0 +1,27 @@
+export const SOUND_EFFECTS = [
+    { id: 'none', name: 'None', src: '' },
+    { id: 'vine-boom', name: 'Vine Boom', src: '/sound/vine-boom.mp3' },
+    { id: 'anime-wow', name: 'Anime Wow', src: '/sound/anime-wow-sound-effect.mp3' },
+    { id: 'bone-crack', name: 'Bone Crack', src: '/sound/bone-crack.mp3' },
+    { id: 'boxing-bell', name: 'Boxing Bell', src: '/sound/boxing-bell.mp3' },
+    { id: 'dry-fart', name: 'Dry Fart', src: '/sound/dry-fart.mp3' },
+    { id: 'error', name: 'Error', src: '/sound/error_CDOxCYm.mp3' },
+    { id: 'faaah', name: 'Faaah', src: '/sound/faaah.mp3' },
+    { id: 'fahhh', name: 'Fahhh', src: '/sound/fahhh_KcgAXfs.mp3' },
+    { id: 'fart-reverb', name: 'Fart Reverb', src: '/sound/fart-with-reverb.mp3' },
+    { id: 'gunshot', name: 'Gunshot', src: '/sound/gunshotjbudden.mp3' },
+    { id: 'mario-jump', name: 'Mario Jump', src: '/sound/maro-jump-sound-effect_1.mp3' },
+    { id: 'metal-gear', name: 'Metal Gear Alert', src: '/sound/metal-gear-alert-sound-effect_XKoHReZ.mp3' },
+    { id: 'notification', name: 'Notification', src: '/sound/notification_o14egLP.mp3' },
+    { id: 'ny-video', name: 'NY Video', src: '/sound/ny-video-online-audio-converter.mp3' },
+    { id: 'pornhub', name: 'Pornhub', src: '/sound/p0rnhub_RXhxxuV.mp3' },
+    { id: 'punch', name: 'Punch', src: '/sound/punch_u4LmMsr.mp3' },
+    { id: 'rizzbot', name: 'Rizzbot Laugh', src: '/sound/rizzbot-laugh.mp3' },
+    { id: 'slap', name: 'Slap', src: '/sound/slap-soundmaster13-49669815_4L20wGP.mp3' },
+    { id: 'audience', name: 'Audience Awww', src: '/sound/studio-audience-awwww-sound-fx.mp3' },
+    { id: 'the-rock', name: 'The Rock', src: '/sound/the-rock-sound-effect.mp3' },
+    { id: 'wrong-answer', name: 'Wrong Answer', src: '/sound/wrong-answer-sound-effect.mp3' },
+    { id: 'zort', name: 'Zort', src: '/sound/zort-sesi.mp3' },
+]
+
+export const FONT_OPTIONS = ["Arial", "Verdana", "Times New Roman", "Courier New", "Georgia", "Trebuchet MS"]

@@ -16,94 +16,16 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import React, { useState, useRef, useEffect, useCallback } from "react"
-import JSZip from "jszip"
+
 import { useRouter } from "next/navigation"
 import { useToast } from "@/components/providers/toast-provider"
+import { useRender } from "@/components/providers/render-provider"
+import { Project, Sentence, Word, CaptionSettings, TimelineItem } from "@/types"
+import { SOUND_EFFECTS, FONT_OPTIONS } from "@/lib/constants"
+// FONT_OPTIONS and SOUND_EFFECTS were locally defined too. Removing local definitions.
 
-interface Word {
-    id: string
-    text: string
-    displayText: string
-    soundEffect?: string
-    soundVolume?: number
-    soundDelay?: number
-    mediaUrl?: string
-    mediaType?: 'image' | 'video'
-    isLineBreak?: boolean
-}
+// Removed local interfaces (Word, Sentence, Project, CaptionSettings, TimelineItem) as they are now imported.
 
-interface Sentence {
-    id: string
-    text: string
-    voice: string
-    speed?: number
-    pitch?: number
-    audioContent?: string // Base64
-    words?: Word[]
-    isGenerating?: boolean
-}
-
-interface Project {
-    id: string
-    type: string
-    title?: string
-    sentences: Sentence[]
-    backgroundVideo?: string
-    backgroundThumbnail?: string
-    captionSettings?: CaptionSettings
-    createdAt: string
-}
-
-
-
-interface CaptionSettings {
-    fontFamily: string
-    fontSize: number
-    isUppercase: boolean
-    fontWeight: 'normal' | 'bold' | 'extra-bold'
-    isItalic: boolean
-    textColor: string
-    hasShadow: boolean
-    shadowColor: string
-    shadowSize: number
-    hasBackground: boolean
-    paddingTop: number
-    swapPosition?: boolean
-}
-
-interface TimelineItem {
-    sentenceId: string
-    startTime: number
-    duration: number
-    audioUrl: string
-}
-
-const FONT_OPTIONS = ["Arial", "Verdana", "Times New Roman", "Courier New", "Georgia", "Trebuchet MS"]
-const SOUND_EFFECTS = [
-    { id: 'none', name: 'None', src: '' },
-    { id: 'vine-boom', name: 'Vine Boom', src: '/sound/vine-boom.mp3' },
-    { id: 'anime-wow', name: 'Anime Wow', src: '/sound/anime-wow-sound-effect.mp3' },
-    { id: 'bone-crack', name: 'Bone Crack', src: '/sound/bone-crack.mp3' },
-    { id: 'boxing-bell', name: 'Boxing Bell', src: '/sound/boxing-bell.mp3' },
-    { id: 'dry-fart', name: 'Dry Fart', src: '/sound/dry-fart.mp3' },
-    { id: 'error', name: 'Error', src: '/sound/error_CDOxCYm.mp3' },
-    { id: 'faaah', name: 'Faaah', src: '/sound/faaah.mp3' },
-    { id: 'fahhh', name: 'Fahhh', src: '/sound/fahhh_KcgAXfs.mp3' },
-    { id: 'fart-reverb', name: 'Fart Reverb', src: '/sound/fart-with-reverb.mp3' },
-    { id: 'gunshot', name: 'Gunshot', src: '/sound/gunshotjbudden.mp3' },
-    { id: 'mario-jump', name: 'Mario Jump', src: '/sound/maro-jump-sound-effect_1.mp3' },
-    { id: 'metal-gear', name: 'Metal Gear Alert', src: '/sound/metal-gear-alert-sound-effect_XKoHReZ.mp3' },
-    { id: 'notification', name: 'Notification', src: '/sound/notification_o14egLP.mp3' },
-    { id: 'ny-video', name: 'NY Video', src: '/sound/ny-video-online-audio-converter.mp3' },
-    { id: 'pornhub', name: 'Pornhub', src: '/sound/p0rnhub_RXhxxuV.mp3' },
-    { id: 'punch', name: 'Punch', src: '/sound/punch_u4LmMsr.mp3' },
-    { id: 'rizzbot', name: 'Rizzbot Laugh', src: '/sound/rizzbot-laugh.mp3' },
-    { id: 'slap', name: 'Slap', src: '/sound/slap-soundmaster13-49669815_4L20wGP.mp3' },
-    { id: 'audience', name: 'Audience Awww', src: '/sound/studio-audience-awwww-sound-fx.mp3' },
-    { id: 'the-rock', name: 'The Rock', src: '/sound/the-rock-sound-effect.mp3' },
-    { id: 'wrong-answer', name: 'Wrong Answer', src: '/sound/wrong-answer-sound-effect.mp3' },
-    { id: 'zort', name: 'Zort', src: '/sound/zort-sesi.mp3' },
-]
 
 const VOICE_MODELS = [
     // Standard Voices
@@ -131,10 +53,21 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
     const [totalDuration, setTotalDuration] = useState(0)
     const [timeline, setTimeline] = useState<TimelineItem[]>([])
 
-    const [isExporting, setIsExporting] = useState(false)
-    const [exportProgress, setExportProgress] = useState(0)
-    const [exportDetails, setExportDetails] = useState({ frame: 0, totalFrames: 0, time: 0, totalTime: 0 })
-    const [exportPhase, setExportPhase] = useState<'preloading' | 'generating' | 'zipping' | 'uploading'>('preloading')
+    // Removed local export states as they are now managed by RenderContext
+    // const [isExporting, setIsExporting] = useState(false)
+    // const [exportProgress, setExportProgress] = useState(0)
+    // const [exportDetails, setExportDetails] = useState({ frame: 0, totalFrames: 0, time: 0, totalTime: 0 })
+    // const [exportPhase, setExportPhase] = useState<'preloading' | 'generating' | 'zipping' | 'uploading'>('preloading')
+
+    // Setup Context
+    const { startRender, isRendering: isContextRendering, progress: contextProgress, status: contextStatus, phase: contextPhase } = useRender()
+
+    // Mapping context state to local variables for compatibility with existing UI (if any modal uses them)
+    // If we want the modal to show, we can use these.
+    const isExporting = isContextRendering
+    const exportProgress = contextProgress
+    const exportPhase = contextPhase
+
 
     const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved')
     const [isAiProcessing, setIsAiProcessing] = useState(false)
@@ -499,607 +432,24 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
 
 
     const handleDownload = async (format: 'mp4' | 'webm' = 'mp4', includeBackground: boolean = true) => {
-        if (project?.sentences.some(s => s.isGenerating)) {
+        if (!project) return
+        if (project.sentences.some(s => s.isGenerating)) {
             showError("Please wait for audio generation to finish before exporting.")
             return
         }
-        setIsExporting(true)
-        setExportProgress(0)
-        setExportDetails({ frame: 0, totalFrames: 0, time: 0, totalTime: 0 })
-        setExportPhase('preloading')
 
-        let jobId: string | null = null
-
-        try {
-            // 1. Create Job immediately
-            const videoTitle = project?.title || (project?.id ? `project-${project.id}` : 'untitled-video')
-            const createRes = await fetch('/api/jobs', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: 'user-1', // TODO: Auth
-                    originalName: `${videoTitle}.mp4`,
-                    status: 'GENERATING'
-                })
-            })
-            if (createRes.ok) {
-                const data = await createRes.json()
-                jobId = data.jobId
-                console.log("Job created:", jobId)
-            }
-
-            const previewCanvas = canvasRef.current
-            const video = videoRef.current
-
-            if (!previewCanvas || !video || !project) {
-                throw new Error("Missing required elements for export")
-            }
-
-            // Create an offscreen canvas for export
-            const canvas = document.createElement('canvas')
-            canvas.width = previewCanvas.width
-            canvas.height = previewCanvas.height
-            const ctx = canvas.getContext('2d')
-
-            if (!ctx) {
-                throw new Error("Failed to create export canvas context")
-            }
-
-            console.log("Starting video export (Server-Side Compositing)...")
-            const exportDuration = totalDurationRef.current
-            const fps = 30
-            const frameDuration = 1 / fps
-            const totalFrames = Math.ceil(exportDuration * fps)
-
-            console.log(`Generating ${totalFrames} overlay frames...`)
-            const zip = new JSZip()
-
-            // Preload images and cache video frames
-            console.log("Preloading images and caching video frames...")
-            const imageCache = new Map<string, HTMLImageElement | ImageBitmap[]>()
-            const uniqueMediaUrls = new Set<string>()
-
-            console.log("Checking sentences for media URLs:", project.sentences.length, "sentences")
-            project.sentences.forEach((s, sIdx) => {
-                console.log(`Sentence ${sIdx}: ${s.words?.length || 0} words`)
-                s.words?.forEach((w, wIdx) => {
-                    if (w.mediaUrl) {
-                        console.log(`  Word ${wIdx} "${w.displayText}" has mediaUrl:`, w.mediaUrl)
-                        uniqueMediaUrls.add(w.mediaUrl)
-                    }
-                })
-            })
-
-            console.log(`Found ${uniqueMediaUrls.size} unique media URLs:`, Array.from(uniqueMediaUrls))
-
-            await Promise.all(Array.from(uniqueMediaUrls).map(async (url) => {
-                try {
-                    // Use proxy for external URLs to bypass CORS
-                    const isExternal = url.startsWith('http://') || url.startsWith('https://')
-                    const proxiedUrl = isExternal ? `/api/proxy?url=${encodeURIComponent(url)}` : url
-
-                    let type = 'image'
-                    for (const s of project.sentences) {
-                        const w = s.words?.find(w => w.mediaUrl === url)
-                        if (w?.mediaType === 'video') {
-                            type = 'video'
-                            break
-                        }
-                        if (url.match(/\.(mp4|webm|ogg|mov)$/i)) {
-                            type = 'video'
-                            break
-                        }
-                    }
-
-                    if (type === 'video') {
-                        console.log(`Downloading video for extraction: ${url}`)
-                        // Fetch as blob to ensure it's fully loaded and seekable
-                        const response = await fetch(proxiedUrl)
-                        const blob = await response.blob()
-                        const objectUrl = URL.createObjectURL(blob)
-
-                        console.log(`Extracting frames from blob: ${url}`)
-                        const video = document.createElement('video')
-                        // video.crossOrigin = "anonymous" // Not needed for Blob URL
-                        video.muted = true
-                        video.preload = "auto"
-                        video.src = objectUrl
-
-                        await new Promise((resolve, reject) => {
-                            video.onloadedmetadata = resolve
-                            video.onerror = reject
-                        })
-
-                        // Extract frames
-                        const frames: ImageBitmap[] = []
-                        const fps = 30
-                        const duration = video.duration || 1
-                        const totalFrames = Math.ceil(duration * fps)
-
-                        // Create a temporary canvas for frame extraction
-                        const tempCanvas = document.createElement('canvas')
-                        tempCanvas.width = video.videoWidth
-                        tempCanvas.height = video.videoHeight
-                        const tempCtx = tempCanvas.getContext('2d')
-
-                        // Hack: Attach to DOM to ensure reliable rendering in some browsers
-                        video.style.position = 'fixed'
-                        video.style.opacity = '0'
-                        video.style.pointerEvents = 'none'
-                        document.body.appendChild(video)
-
-                        if (tempCtx) {
-                            for (let i = 0; i < totalFrames; i++) {
-                                const time = i / fps
-                                video.currentTime = time
-
-                                await new Promise<void>(resolve => {
-                                    const onSeeked = () => {
-                                        video.removeEventListener('seeked', onSeeked)
-                                        // Small delay to ensure frame is decoded and ready on GPU
-                                        setTimeout(resolve, 50)
-                                    }
-
-                                    // Always wait for seeked event to be safe, unless we are at 0 and already there
-                                    if (i === 0 && video.currentTime === 0 && video.readyState >= 2) {
-                                        resolve()
-                                    } else {
-                                        video.addEventListener('seeked', onSeeked)
-                                    }
-                                })
-
-                                tempCtx.drawImage(video, 0, 0)
-                                const bitmap = await createImageBitmap(tempCanvas)
-                                frames.push(bitmap)
-
-                                // Progress log every 30 frames
-                                if (i % 30 === 0) console.log(`  Extracted frame ${i}/${totalFrames} for ${url.slice(-20)}`)
-                            }
-                        }
-
-                        // Cleanup
-                        document.body.removeChild(video)
-                        URL.revokeObjectURL(objectUrl)
-
-                        imageCache.set(url, frames)
-                        console.log(`✓ Extracted ${frames.length} frames for: ${url}`)
-                    } else {
-                        const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-                            const image = new Image()
-                            image.crossOrigin = "anonymous"
-                            image.onload = () => resolve(image)
-                            image.onerror = (e) => reject(e)
-                            image.src = proxiedUrl
-                        })
-                        imageCache.set(url, img)
-                        console.log(`✓ Loaded image: ${url}`)
-                    }
-                } catch (e) {
-                    console.warn(`✗ Failed to preload media ${url}:`, e)
-                }
-            }))
-            console.log(`Preloaded ${imageCache.size} media items`)
-
-            // Fetch Background Video
-            console.log("Fetching background video...")
-            let videoBlob: Blob | null = null
-            if (includeBackground && video.src) {
-                try {
-                    const response = await fetch(video.src)
-                    videoBlob = await response.blob()
-                    console.log("Background video fetched:", videoBlob.size)
-                    zip.file("background.mp4", videoBlob)
-                } catch (e) {
-                    console.error("Failed to fetch background video", e)
-                }
-            }
-
-            // Export Loop - Concurrent Batch Processing
-            setExportPhase('generating')
-            setExportDetails({ frame: 0, totalFrames, time: 0, totalTime: exportDuration })
-
-            // Pre-calculate text layouts for all sentences
-            console.log("Pre-calculating text layouts...")
-            const layoutCache = new Map<string, { lines: { words: any[], width: number }[], totalHeight: number }>()
-
-            // Create a temporary canvas for text measurement
-            const measureCanvas = document.createElement('canvas')
-
-            // RESOLUTION MATCHING FOR LAYOUT:
-            let exportWidth = video.videoWidth || previewCanvas.width || 1080
-            let exportHeight = video.videoHeight || previewCanvas.height || 1920
-            if (exportWidth === 0) exportWidth = 1080
-            if (exportHeight === 0) exportHeight = 1920
-
-            measureCanvas.width = exportWidth
-            measureCanvas.height = exportHeight
-            const measureCtx = measureCanvas.getContext('2d')!
-
-            project.sentences.forEach(sentence => {
-                if (!sentence.words) return
-
-                const weight = captionSettings.fontWeight === 'extra-bold' ? '900' : captionSettings.fontWeight
-                const style = captionSettings.isItalic ? 'italic' : 'normal'
-                measureCtx.font = `${style} ${weight} ${captionSettings.fontSize}px ${captionSettings.fontFamily}`
-
-                const maxWidth = measureCanvas.width * 0.7 // Reduced to 70% for safer margins
-                const lines: { words: any[], width: number }[] = []
-                let currentLineWords: any[] = []
-                let currentLineWidth = 0
-
-                sentence.words.forEach((word) => {
-                    let text = word.displayText
-                    if (captionSettings.isUppercase) text = text.toUpperCase()
-                    const wordWidth = measureCtx.measureText(text + " ").width
-
-                    if (currentLineWidth + wordWidth < maxWidth) {
-                        currentLineWords.push(word)
-                        currentLineWidth += wordWidth
-                    } else {
-                        lines.push({ words: currentLineWords, width: currentLineWidth - measureCtx.measureText(" ").width })
-                        currentLineWords = [word]
-                        currentLineWidth = wordWidth
-                    }
-                })
-                if (currentLineWords.length > 0) {
-                    lines.push({ words: currentLineWords, width: currentLineWidth - measureCtx.measureText(" ").width })
-                }
-
-                const lineHeight = captionSettings.fontSize * 1.3
-                const totalHeight = lines.length * lineHeight
-                layoutCache.set(sentence.id, { lines, totalHeight })
-            })
-
-            // BATCH PROCESSING WITH FRESH CANVAS ISOLATION
-            const CONCURRENCY = 4
-            // Load watermark
-            const watermarkImg = new Image()
-            watermarkImg.src = '/watermark.jpg'
-            await new Promise((resolve) => {
-                watermarkImg.onload = resolve
-                watermarkImg.onerror = resolve
-            })
-
-            for (let i = 0; i < totalFrames; i += CONCURRENCY) {
-                const batchPromises: Promise<void>[] = []
-                for (let j = 0; j < CONCURRENCY && i + j < totalFrames; j++) {
-                    const task = (async () => {
-                        const frameIdx = i + j
-                        const exportTime = frameIdx * frameDuration
-
-                        // 1. FRESH CANVAS CREATION (CLEAN ROOM STRATEGY)
-                        const canvas = document.createElement('canvas')
-
-                        // RESOLUTION MATCHING:
-                        // Canvas boyutu, arka plan videosunun boyutuyla BİREBİR aynı olmalı.
-                        let exportWidth = video.videoWidth || previewCanvas.width || 1080
-                        let exportHeight = video.videoHeight || previewCanvas.height || 1920
-
-                        if (exportWidth === 0) exportWidth = 1080
-                        if (exportHeight === 0) exportHeight = 1920
-
-                        canvas.width = exportWidth
-                        canvas.height = exportHeight
-
-                        const ctx = canvas.getContext('2d', { alpha: true })
-                        if (!ctx) return
-
-                        // Clear is technically not needed on new canvas, but good practice
-                        ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-                        // --- DRAWING LOGIC (ABSOLUTE COORDINATES) ---
-
-                        // Draw "Subscribe for more" Banner
-                        const bannerHeight = canvas.height * 0.05 // 5% of height
-                        ctx.fillStyle = '#ff0000'
-                        ctx.fillRect(0, 0, canvas.width, bannerHeight)
-
-                        ctx.fillStyle = '#ffffff'
-                        ctx.font = `bold ${Math.round(bannerHeight * 0.6)}px Arial`
-                        ctx.textAlign = 'center'
-                        ctx.textBaseline = 'middle'
-                        ctx.fillText("Subscribe for more", canvas.width / 2, bannerHeight / 2)
-
-                        const currentTimeline = timelineRef.current
-                        const index = currentTimeline.findIndex(t => exportTime >= t.startTime && exportTime < t.startTime + t.duration)
-                        const currentSentence = project.sentences[index]
-
-                        if (currentSentence && currentSentence.words && currentTimeline[index]) {
-                            const sentenceTimeline = currentTimeline[index]
-                            const timeInSentence = exportTime - sentenceTimeline.startTime
-                            const wordCount = currentSentence.words.length
-                            const wordDuration = sentenceTimeline.duration / wordCount
-
-                            // 2. GÖRSEL ÇİZİMİ
-                            for (let k = 0; k < wordCount; k++) {
-                                const word = currentSentence.words[k]
-                                if (word.mediaUrl) {
-                                    const wordStartTime = sentenceTimeline.startTime + (k * wordDuration)
-                                    const timeSinceWordStart = exportTime - wordStartTime
-
-                                    if (timeSinceWordStart >= 0 && timeSinceWordStart <= 3.0) {
-                                        const media = imageCache.get(word.mediaUrl)
-                                        if (media) {
-                                            let w, h, drawMedia
-
-                                            if (Array.isArray(media)) {
-                                                // It's a cached video (ImageBitmap[])
-                                                // Calculate which frame to show
-                                                const fps = 30
-                                                const frameIndex = Math.floor(timeSinceWordStart * fps) % media.length
-                                                const frame = media[frameIndex]
-
-                                                if (frame) {
-                                                    w = frame.width
-                                                    h = frame.height
-                                                    drawMedia = frame
-                                                }
-                                            } else {
-                                                // It's an image (HTMLImageElement)
-                                                w = media.naturalWidth || media.width
-                                                h = media.naturalHeight || media.height
-                                                drawMedia = media
-                                            }
-
-                                            if (w && h && drawMedia) {
-                                                // GÖRSEL AYARLARI:
-                                                const maxWidth = canvas.width * 0.8
-                                                const maxHeight = canvas.height * 0.55
-
-                                                const scale = Math.min(maxWidth / w, maxHeight / h)
-                                                const finalW = w * scale
-                                                const finalH = h * scale
-
-                                                // POZİSYONLAMA (MUTLAK):
-                                                // Yatay: (Canvas Genişliği - Resim Genişliği) / 2
-                                                const imgX = (canvas.width - finalW) / 2
-
-                                                // Dikey: Swap Position kontrolü
-                                                let imgY
-                                                if (captionSettings.swapPosition) {
-                                                    // Swap Mode: Image at Bottom (approx 75% down)
-                                                    imgY = (canvas.height * 0.75) - (finalH / 2)
-                                                } else {
-                                                    // Default: Image Center-ish (shifted up 15%)
-                                                    imgY = (canvas.height / 2) - (finalH / 2) - (canvas.height * 0.15)
-                                                }
-
-                                                // Debug Log (Only for first few frames to reduce noise)
-                                                if (frameIdx < 5) {
-                                                    console.log(`[Export Debug] Frame: ${frameIdx}, Canvas: ${canvas.width}x${canvas.height}, Image: ${w}x${h}, Final: ${finalW}x${finalH}, Pos: ${imgX},${imgY}`);
-                                                }
-
-                                                ctx.drawImage(drawMedia, imgX, imgY, finalW, finalH)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // 3. ALTYAZI ÇİZİMİ
-                            const layout = layoutCache.get(currentSentence.id)
-                            if (layout) {
-                                const fontSize = captionSettings.fontSize || 40
-                                const weight = captionSettings.fontWeight === 'extra-bold' ? '900' : (captionSettings.fontWeight || 'bold')
-                                const style = captionSettings.isItalic ? 'italic' : 'normal'
-                                const fontFamily = captionSettings.fontFamily || 'Arial'
-
-                                ctx.font = `${style} ${weight} ${fontSize}px ${fontFamily}`
-                                ctx.textAlign = "left"
-                                ctx.textBaseline = "middle"
-
-                                const lineHeight = fontSize * 1.3
-                                const startY = captionSettings.swapPosition
-                                    ? canvas.height * 0.15 // Top
-                                    : canvas.height * 0.85 // Bottom (Default)
-
-                                const currentWordIndex = Math.floor(timeInSentence / wordDuration)
-                                const currentWord = currentSentence.words[currentWordIndex]
-
-                                layout.lines.forEach((line, lineIdx) => {
-                                    const lineY = startY + (lineIdx * lineHeight)
-                                    let currentX = (canvas.width - line.width) / 2
-
-                                    line.words.forEach((word) => {
-                                        let text = word.displayText || ""
-                                        if (captionSettings.isUppercase) text = text.toUpperCase()
-
-                                        const isCurrentWord = currentWord && word.id === currentWord.id
-
-                                        ctx.fillStyle = isCurrentWord ? '#ffff00' : (captionSettings.textColor || '#ffffff')
-
-                                        if (captionSettings.hasShadow) {
-                                            ctx.fillStyle = captionSettings.shadowColor || 'black'
-                                            ctx.fillText(text, currentX + 3, lineY + 3)
-                                            ctx.fillStyle = isCurrentWord ? '#ffff00' : (captionSettings.textColor || '#ffffff')
-                                        }
-
-                                        ctx.strokeStyle = 'black'
-                                        ctx.lineWidth = fontSize * 0.15
-                                        ctx.lineJoin = 'round'
-                                        ctx.strokeText(text, currentX, lineY)
-                                        ctx.fillText(text, currentX, lineY)
-
-                                        currentX += ctx.measureText(text + " ").width
-                                    })
-                                })
-                            }
-                        }
-
-                        // Draw Watermark
-                        if (watermarkImg.complete && watermarkImg.naturalWidth > 0) {
-                            ctx.globalAlpha = 0.5
-                            const wmWidth = canvas.width * 0.15
-                            const wmHeight = wmWidth * (watermarkImg.height / watermarkImg.width)
-                            const wmX = canvas.width - wmWidth - 20
-                            const wmY = canvas.height - wmHeight - 20
-                            ctx.drawImage(watermarkImg, wmX, wmY, wmWidth, wmHeight)
-                            ctx.globalAlpha = 1.0
-                        }
-
-                        // Add frame to zip
-                        await new Promise<void>(resolve => {
-                            canvas.toBlob(blob => {
-                                if (blob) {
-                                    const filename = `frame${frameIdx.toString().padStart(5, '0')}.webp`
-                                    zip.file(filename, blob)
-                                }
-                                resolve()
-                            }, 'image/webp')
-                        })
-
-                        // Canvas cleanup
-                        canvas.width = 0;
-                        canvas.height = 0;
-                    })()
-                    batchPromises.push(task)
-                }
-
-                await Promise.all(batchPromises)
-
-                // Update UI
-                if (i % 20 === 0 || i >= totalFrames - CONCURRENCY) {
-                    const progress = Math.round((i / totalFrames) * 80)
-                    setExportProgress(progress)
-                    setExportDetails({
-                        frame: Math.min(i + CONCURRENCY, totalFrames),
-                        totalFrames,
-                        time: i * frameDuration,
-                        totalTime: exportDuration
-                    })
-                    await new Promise(resolve => setTimeout(resolve, 0))
-                }
-            }
-
-            console.log("All overlay frames generated, preparing audio...")
-            setExportProgress(80)
-
-            // Calculate actual FPS
-            const actualFps = Math.round(totalFrames / exportDuration)
-            console.log(`Using FPS: ${actualFps} (${totalFrames} frames / ${exportDuration}s)`)
-
-            // Collect TTS audio tracks
-            const ttsTracks = await Promise.all(
-                timelineRef.current.map(async (item) => {
-                    const response = await fetch(item.audioUrl)
-                    const blob = await response.blob()
-                    return {
-                        type: 'tts',
-                        startTime: item.startTime,
-                        blob: blob
-                    }
-                })
-            )
-
-            // Collect Sound Effects
-            const sfxTracks: { type: string, startTime: number, blob: Blob }[] = []
-            for (let i = 0; i < timelineRef.current.length; i++) {
-                const sentenceTimeline = timelineRef.current[i]
-                const sentence = project.sentences[i]
-
-                if (sentence && sentence.words) {
-                    const wordDuration = sentenceTimeline.duration / sentence.words.length
-                    for (let j = 0; j < sentence.words.length; j++) {
-                        const word = sentence.words[j]
-                        if (word.soundEffect && word.soundEffect !== 'none') {
-                            const effect = SOUND_EFFECTS.find(e => e.id === word.soundEffect)
-                            if (effect && effect.src) {
-                                try {
-                                    const response = await fetch(effect.src)
-                                    const blob = await response.blob()
-                                    const startTime = sentenceTimeline.startTime + (j * wordDuration)
-                                    sfxTracks.push({
-                                        type: 'sfx',
-                                        startTime: startTime,
-                                        blob: blob
-                                    })
-                                } catch (e) {
-                                    console.warn("Failed to fetch SFX:", effect.name)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Create metadata
-            const metadata = {
-                fps: actualFps,
-                duration: exportDuration,
-                width: canvas.width,
-                height: canvas.height,
-                mode: 'overlay',
-                backgroundVideo: project.backgroundVideo,
-                backgroundThumbnail: project.backgroundThumbnail,
-                projectId: project.id,
-                audioTracks: [
-                    ...ttsTracks.map(t => ({ type: 'tts', startTime: t.startTime, filename: `tts_${t.startTime}.mp3` })),
-                    ...sfxTracks.map(t => ({ type: 'sfx', startTime: t.startTime, filename: `sfx_${t.startTime}.mp3` }))
-                ]
-            }
-
-            zip.file("metadata.json", JSON.stringify(metadata))
-
-            // Add audio files to zip
-            console.log(`Adding ${ttsTracks.length} TTS tracks and ${sfxTracks.length} SFX tracks to zip`)
-            ttsTracks.forEach(t => zip.file(`tts_${t.startTime}.mp3`, t.blob))
-            sfxTracks.forEach(t => zip.file(`sfx_${t.startTime}.mp3`, t.blob))
-
-            console.log("Zipping...")
-            setExportPhase('zipping')
-            setExportProgress(85)
-
-            const content = await zip.generateAsync({
-                type: "blob",
-                compression: "STORE"
-            }, (metadata) => {
-                const zipProgress = 85 + Math.round(metadata.percent * 0.1)
-                setExportProgress(zipProgress)
-                console.log(`Zipping: ${metadata.percent.toFixed(1)}%`)
-            })
-
-            // Upload to Job
-            setExportPhase('uploading')
-            const formData = new FormData()
-            formData.append('file', content, 'project.zip')
-            formData.append('originalName', `${videoTitle}.mp4`)
-            if (jobId) {
-                formData.append('jobId', jobId)
-            }
-
-            const uploadRes = await fetch('/api/jobs', {
-                method: 'POST',
-                body: formData
-            })
-
-            if (!uploadRes.ok) throw new Error("Upload failed")
-
-            setExportProgress(100)
-            info("Export started! Check 'My Jobs' for progress.")
-            setIsExporting(false)
-
-
-        } catch (error) {
-            console.error("Export failed:", error)
-
-            if (jobId) {
-                try {
-                    await fetch(`/api/jobs/${jobId}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            status: 'FAILED',
-                            error: error instanceof Error ? error.message : 'Export failed'
-                        })
-                    })
-                } catch (e) {
-                    console.warn("Failed to update job status:", e)
-                }
-            }
-
-            showError("Export failed. See console for details.")
-            setIsExporting(false)
+        // Get dimensions from current preview elements if available, otherwise default
+        let width = 1080
+        let height = 1920
+        if (videoRef.current && videoRef.current.videoWidth) {
+            width = videoRef.current.videoWidth
+            height = videoRef.current.videoHeight
+        } else if (canvasRef.current) {
+            width = canvasRef.current.width
+            height = canvasRef.current.height
         }
+
+        startRender(project, captionSettings, width, height)
     }
 
     const generateAudioForSentence = async (text: string, voiceId: string, speed: number, pitch: number) => {
@@ -1300,8 +650,9 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    script: wordText,
-                    availableSounds: SOUND_EFFECTS.filter(s => s.id !== 'none')
+                    sentences: [{ id: sentenceId, text: wordText }],
+                    availableSounds: SOUND_EFFECTS.filter(s => s.id !== 'none'),
+                    ignoreConstraints: true
                 })
             })
 
@@ -1333,64 +684,99 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
         if (!project) return
         setIsAiProcessing(true)
         try {
-            // Construct script from sentences
-            const script = project.sentences.map(s => s.text).join(" ")
+            // Construct script        try {
+            const sentencesPayload = project.sentences.map(s => ({
+                id: s.id,
+                text: s.text
+            }))
 
             const res = await fetch('/api/ai-overlays', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({
-                    script,
-                    availableSounds: SOUND_EFFECTS.filter(s => s.id !== 'none')
+                    sentences: sentencesPayload,
+                    availableSounds: SOUND_EFFECTS
                 })
             })
 
+            const data = await res.json()
+
             if (res.ok) {
-                const data = await res.json()
                 if (data.overlays && data.overlays.length > 0) {
                     let updatedCount = 0
                     const newSentences = [...project.sentences]
 
                     // Helper to normalize text for matching
-                    const normalize = (text: string) => text.toLowerCase().replace(/[^\w\s]/g, '').trim()
+                    const normalize = (text: string) => text.toLowerCase()
+                        .replace(/[’'"]/g, '') // Remove quotes
+                        .replace(/[^\w\s]/g, '') // Remove other punctuation
+                        .replace(/\s+/g, ' ') // Collapse whitespace
+                        .trim()
 
                     data.overlays.forEach((overlay: any) => {
+                        // Find matching sentence by ID
+                        const sIdx = newSentences.findIndex(s => s.id === overlay.sentenceId)
+                        if (sIdx === -1) return
+
+                        const sentence = newSentences[sIdx]
+                        if (!sentence.words || sentence.words.length === 0) return
+
                         const overlayPhrase = normalize(overlay.word)
-                        const overlayWords = overlayPhrase.split(/\s+/)
+                        const overlayWords = overlayPhrase.split(' ')
 
-                        // Search through sentences to find the phrase
-                        for (let sIdx = 0; sIdx < newSentences.length; sIdx++) {
-                            const sentence = newSentences[sIdx]
-                            if (!sentence.words) continue
+                        const sentenceWords = sentence.words.map(w => ({
+                            ...w,
+                            normalized: normalize(w.displayText)
+                        }))
 
-                            const sentenceWords = sentence.words
+                        let matchIndex = -1
 
-                            // Try to match the phrase starting at each word
-                            for (let wIdx = 0; wIdx <= sentenceWords.length - overlayWords.length; wIdx++) {
-                                let match = true
-                                for (let k = 0; k < overlayWords.length; k++) {
-                                    if (normalize(sentenceWords[wIdx + k].text) !== overlayWords[k]) {
-                                        match = false
-                                        break
-                                    }
-                                }
-
-                                if (match) {
-                                    // Apply overlay to the first word of the phrase
-                                    // Check if already has overlay to avoid overwriting (optional, but good for now)
-                                    // if (!sentenceWords[wIdx].mediaUrl) {
-                                    sentenceWords[wIdx] = {
-                                        ...sentenceWords[wIdx],
-                                        mediaUrl: overlay.mediaUrl,
-                                        mediaType: overlay.mediaType || 'image',
-                                        soundEffect: overlay.soundEffect || sentenceWords[wIdx].soundEffect
-                                    }
-                                    updatedCount++
-                                    // Skip ahead to avoid overlapping matches for the same phrase (though unlikely with this loop)
-                                    // wIdx += overlayWords.length - 1 
-                                    // }
+                        // Strategy 1: Exact Phrase Match sequence
+                        for (let wIdx = 0; wIdx <= sentenceWords.length - overlayWords.length; wIdx++) {
+                            let match = true
+                            for (let k = 0; k < overlayWords.length; k++) {
+                                if (sentenceWords[wIdx + k].normalized !== overlayWords[k]) {
+                                    match = false
+                                    break
                                 }
                             }
+                            if (match) {
+                                matchIndex = wIdx
+                                break
+                            }
+                        }
+
+                        // Strategy 2: Fallback - Match Longest Substituted Word (if > 4 chars)
+                        if (matchIndex === -1 && overlayWords.length > 1) {
+                            // Find longest word in overlay
+                            const longestWord = overlayWords.reduce((a: string, b: string) => a.length > b.length ? a : b, "")
+                            if (longestWord.length >= 4) {
+                                matchIndex = sentenceWords.findIndex(w => w.normalized === longestWord)
+                            }
+                        }
+
+                        // Strategy 3: Single word simple match
+                        if (matchIndex === -1) {
+                            matchIndex = sentenceWords.findIndex(w => w.normalized === overlayPhrase)
+                        }
+
+                        // Strategy 4 (Universal Fallback): Apply to the first word if everything matched fails
+                        // Logic: We MUST show the overlay for this sentence since the AI generated it.
+                        if (matchIndex === -1) {
+                            matchIndex = 0
+                        }
+
+                        // Apply overlay
+                        if (matchIndex !== -1 && newSentences[sIdx].words) {
+                            newSentences[sIdx].words![matchIndex] = {
+                                ...newSentences[sIdx].words![matchIndex],
+                                mediaUrl: overlay.mediaUrl,
+                                mediaType: overlay.mediaType || 'image',
+                                soundEffect: overlay.soundEffect || newSentences[sIdx].words![matchIndex].soundEffect
+                            }
+                            updatedCount++
                         }
                     })
 
@@ -2222,9 +1608,9 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                                                                     `Uploading ${exportProgress}%`}
                                                     </span>
                                                 </div>
-                                                {exportDetails.totalFrames > 0 && exportPhase === 'generating' && (
+                                                {contextStatus && (
                                                     <span className="text-[10px] text-muted-foreground pl-6">
-                                                        Frame {exportDetails.frame}/{exportDetails.totalFrames} • {exportDetails.time.toFixed(1)}s / {exportDetails.totalTime.toFixed(1)}s
+                                                        {contextStatus}
                                                     </span>
                                                 )}
                                             </div>
@@ -2317,20 +1703,20 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                             }
 
                             return (
-                                <div className={`absolute inset-0 flex justify-center pointer-events-none ${captionSettings.swapPosition ? 'items-end' : 'items-center'}`} style={{ paddingBottom: captionSettings.swapPosition ? '15%' : '25%' }}>
+                                <div className={`absolute inset-0 flex justify-center w-full px-8 pointer-events-none ${captionSettings.swapPosition ? 'items-end pb-[20%]' : 'items-center pb-[20%]'}`}>
                                     {activeMediaType === 'video' ? (
                                         <video
                                             src={activeMediaUrl}
                                             autoPlay
                                             loop
                                             muted
-                                            className="max-w-[400px] max-h-[400px] object-contain"
+                                            className="w-full max-w-md object-contain rounded-lg shadow-2xl"
                                         />
                                     ) : (
                                         <img
                                             src={activeMediaUrl}
                                             alt="Word media"
-                                            className="max-w-[400px] max-h-[400px] object-contain"
+                                            className="w-full max-w-md object-contain rounded-lg shadow-2xl"
                                         />
                                     )}
                                 </div>
