@@ -7,6 +7,8 @@ export interface RenderOptions {
     captionSettings: CaptionSettings
     width: number
     height: number
+    outputWidth?: number
+    outputHeight?: number
     backgroundVideoUrl?: string
     userId: string
     onProgress: (progress: number, details: string, phase: string) => void
@@ -29,6 +31,8 @@ export const renderVideo = async ({
     captionSettings,
     width,
     height,
+    outputWidth,
+    outputHeight,
     backgroundVideoUrl,
     userId,
     onProgress,
@@ -507,7 +511,7 @@ export const renderVideo = async ({
 
         // Add Audio
         onProgress(80, 'Processing audio...', 'zipping')
-        const audioTracks: { filename: string, startTime: number }[] = []
+        const audioTracks: { filename: string, startTime: number, volume?: number, loop?: boolean }[] = []
 
         let exportOffset = 0
         for (const item of timeline) {
@@ -544,6 +548,23 @@ export const renderVideo = async ({
             }
         }
 
+        // Add Background Music (Piano)
+        try {
+            const bgMusicRes = await fetch('/music/background-piano.mp3')
+            if (bgMusicRes.ok) {
+                const bgBlob = await bgMusicRes.blob()
+                zip.file("bg_music.mp3", bgBlob)
+                audioTracks.push({
+                    filename: "bg_music.mp3",
+                    startTime: 0,
+                    volume: 0.1, // Low volume ("kısık sesli")
+                    loop: true
+                })
+            }
+        } catch (e) {
+            console.warn("Failed to add background music:", e)
+        }
+
         // Add JSON
         zip.file("project.json", JSON.stringify(project, null, 2))
 
@@ -553,6 +574,8 @@ export const renderVideo = async ({
             duration: totalDuration, // Use calculated duration
             width: width,
             height: height,
+            outputWidth: outputWidth || width,
+            outputHeight: outputHeight || height,
             mode: 'overlay',
             backgroundVideo: project.backgroundVideo,
             backgroundThumbnail: project.backgroundThumbnail,

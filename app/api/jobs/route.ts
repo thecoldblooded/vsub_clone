@@ -211,8 +211,12 @@ async function processJob(jobId: string, zipFile: File) {
             duration: 0,
             format: 'mp4',
             mode: 'standard', // 'standard' or 'overlay'
-            audioTracks: [] as { filename: string, startTime: number }[]
-        }
+            width: 1080,
+            height: 1920,
+            outputWidth: 1080,
+            outputHeight: 1920,
+            audioTracks: [] as { filename: string, startTime: number, volume?: number, loop?: boolean }[]
+        } as any // Use any temporarily or define full type properly
 
         if (keys.includes('metadata.json')) {
             const metaContent = await zip.files['metadata.json'].async('string')
@@ -271,16 +275,17 @@ async function processJob(jobId: string, zipFile: File) {
         // Merge Audio Tracks
         let hasAudio = false
         if (metadata.audioTracks && metadata.audioTracks.length > 0) {
-            const audioInputs: string[] = []
+            const audioInputs: { path: string, loop?: boolean }[] = []
             const filterComplex: string[] = []
 
-            metadata.audioTracks.forEach((track, i) => {
+            metadata.audioTracks.forEach((track: any, i: number) => {
                 const audioPath = path.join(tempDir, track.filename)
                 if (fsSync.existsSync(audioPath)) {
-                    audioInputs.push(audioPath)
+                    audioInputs.push({ path: audioPath, loop: track.loop })
                     const startTimeMs = Math.round(track.startTime * 1000)
+                    const volume = track.volume !== undefined ? track.volume : 1.0
                     // adelay adds delay to all channels. | delimiter separates per channel.
-                    filterComplex.push(`[${i}:a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,adelay=${startTimeMs}|${startTimeMs}[a${i}]`)
+                    filterComplex.push(`[${i}:a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,adelay=${startTimeMs}|${startTimeMs},volume=${volume}[a${i}]`)
                 }
             })
 
@@ -299,8 +304,14 @@ async function processJob(jobId: string, zipFile: File) {
 
                 await new Promise<void>((resolve, reject) => {
                     const cmd = ffmpeg()
-                    audioInputs.forEach(input => cmd.input(input))
+                    audioInputs.forEach(input => {
+                        cmd.input(input.path)
+                        if (input.loop) {
+                            cmd.inputOptions(['-stream_loop', '-1'])
+                        }
+                    })
                     cmd.complexFilter(filterComplex, 'aout')
+                        .duration(metadata.duration || 600) // Safety cap
                         .output(mergedAudioPath)
                         .on('end', () => resolve())
                         .on('error', (err) => reject(err))
@@ -333,9 +344,16 @@ async function processJob(jobId: string, zipFile: File) {
                     .inputOptions(['-framerate', metadata.fps.toString()])
 
                 // Use format filter with alpha to ensure transparency works
+                // Scale [0:v] (background) to metadata.outputWidth x metadata.outputHeight using 'scale' filter before overlay
+                // This ensures upscaling/downscaling of background to designated render resolution.
+                // We use scale=w:h:force_original_aspect_ratio=increase,crop=w:h to fill the screen
+                const w = metadata.outputWidth || metadata.width
+                const h = metadata.outputHeight || metadata.height
+
                 cmd.complexFilter([
-                    '[1:v]format=rgba[ovr]',
-                    '[0:v][ovr]overlay=format=auto:shortest=1[outv]'
+                    `[0:v]scale=${w}:${h}:force_original_aspect_ratio=increase:flags=bilinear,crop=${w}:${h}[bg]`,
+                    `[1:v]scale=${w}:${h}:flags=bilinear,format=rgba[ovr]`, // Also scale overlay if needed
+                    '[bg][ovr]overlay=format=auto:shortest=1[outv]'
                 ])
 
                 // Audio
@@ -364,7 +382,7 @@ async function processJob(jobId: string, zipFile: File) {
                 ])
             } else {
                 cmd.outputOptions([
-                    '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '23', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k'
+                    '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '28', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-threads', 'auto'
                 ])
             }
 

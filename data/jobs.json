@@ -1,1 +1,139 @@
-[]
+[
+  {
+    "id": "370a4ee6-43c9-460a-a47b-79053de485c2",
+    "userId": "user-1",
+    "type": "VIDEO_EXPORT",
+    "status": "COMPLETED",
+    "progress": 100,
+    "createdAt": "2025-12-11T20:28:46.446Z",
+    "updatedAt": "2025-12-11T20:45:47.350Z",
+    "metadata": {
+      "fps": 30,
+      "duration": 44.058751,
+      "format": "mp4",
+      "mode": "overlay",
+      "width": 2160,
+      "height": 3840,
+      "outputWidth": 2160,
+      "outputHeight": 3840,
+      "audioTracks": [
+        {
+          "filename": "tts_0.000.mp3",
+          "startTime": 0
+        },
+        {
+          "filename": "sfx_0.368.mp3",
+          "startTime": 0.36828340000000004
+        },
+        {
+          "filename": "tts_2.341.mp3",
+          "startTime": 2.341417
+        },
+        {
+          "filename": "sfx_3.255.mp3",
+          "startTime": 3.254917
+        },
+        {
+          "filename": "tts_6.267.mp3",
+          "startTime": 6.267042
+        },
+        {
+          "filename": "sfx_7.210.mp3",
+          "startTime": 7.210067538461539
+        },
+        {
+          "filename": "tts_9.832.mp3",
+          "startTime": 9.831875
+        },
+        {
+          "filename": "sfx_10.309.mp3",
+          "startTime": 10.309180666666666
+        },
+        {
+          "filename": "tts_11.764.mp3",
+          "startTime": 11.763792
+        },
+        {
+          "filename": "sfx_12.919.mp3",
+          "startTime": 12.918762357142857
+        },
+        {
+          "filename": "tts_15.498.mp3",
+          "startTime": 15.497709
+        },
+        {
+          "filename": "sfx_16.991.mp3",
+          "startTime": 16.991409
+        },
+        {
+          "filename": "tts_19.732.mp3",
+          "startTime": 19.731959
+        },
+        {
+          "filename": "sfx_20.310.mp3",
+          "startTime": 20.31023405
+        },
+        {
+          "filename": "tts_24.087.mp3",
+          "startTime": 24.087125999999998
+        },
+        {
+          "filename": "sfx_24.598.mp3",
+          "startTime": 24.59828770588235
+        },
+        {
+          "filename": "tts_27.484.mp3",
+          "startTime": 27.483708999999998
+        },
+        {
+          "filename": "sfx_27.484.mp3",
+          "startTime": 27.483708999999998
+        },
+        {
+          "filename": "tts_31.742.mp3",
+          "startTime": 31.742334
+        },
+        {
+          "filename": "tts_33.503.mp3",
+          "startTime": 33.502792
+        },
+        {
+          "filename": "tts_35.242.mp3",
+          "startTime": 35.241709
+        },
+        {
+          "filename": "sfx_35.441.mp3",
+          "startTime": 35.44065811111111
+        },
+        {
+          "filename": "tts_37.532.mp3",
+          "startTime": 37.532251
+        },
+        {
+          "filename": "sfx_37.894.mp3",
+          "startTime": 37.89409475
+        },
+        {
+          "filename": "tts_40.927.mp3",
+          "startTime": 40.927001000000004
+        },
+        {
+          "filename": "sfx_42.024.mp3",
+          "startTime": 42.0235635
+        },
+        {
+          "filename": "bg_music.mp3",
+          "startTime": 0,
+          "volume": 0.1,
+          "loop": true
+        }
+      ],
+      "backgroundVideo": "/uploads/1765480277933-120810.mp4",
+      "backgroundThumbnail": "/uploads/1765480278743-thumbnail.jpg",
+      "projectId": "f2c2e39f-e0c3-404d-85a5-2a9db377e588",
+      "originalName": "MY MOM RUINED MY LIFE 😭🙏.mp4",
+      "size": 1757137182
+    },
+    "resultUrl": "/videos/job-370a4ee6-43c9-460a-a47b-79053de485c2.mp4"
+  }
+]

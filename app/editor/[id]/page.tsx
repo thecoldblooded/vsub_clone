@@ -79,6 +79,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const audioRef = useRef<HTMLAudioElement | null>(null)
     const soundEffectRef = useRef<HTMLAudioElement | null>(null)
+    const bgMusicRef = useRef<HTMLAudioElement | null>(null)
     const requestRef = useRef<number>(0)
     const lastTimeRef = useRef<number>(0)
 
@@ -96,7 +97,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
     const [isCaptionsOpen, setIsCaptionsOpen] = useState(true)
     const [captionSettings, setCaptionSettings] = useState<CaptionSettings>({
         fontFamily: 'Arial',
-        fontSize: 48,
+        fontSize: 96,
         isUppercase: false,
         fontWeight: 'bold',
         isItalic: false,
@@ -144,6 +145,18 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
         }
         loadProject()
     }, [resolvedParams.id])
+
+    // Initialize Background Music
+    useEffect(() => {
+        const audio = new Audio('/music/background-piano.mp3')
+        audio.loop = true
+        audio.volume = 0.1 // Low volume
+        bgMusicRef.current = audio
+        return () => {
+            audio.pause()
+            bgMusicRef.current = null
+        }
+    }, [])
 
     // Auto-save Project
     useEffect(() => {
@@ -352,6 +365,21 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             }
         }
 
+        // Sync Background Music
+        if (bgMusicRef.current) {
+            const bgDuration = bgMusicRef.current.duration
+            if (bgDuration && Number.isFinite(bgDuration)) {
+                if (forceSeek) {
+                    bgMusicRef.current.currentTime = time % bgDuration
+                }
+                if (isPlayingRef.current) {
+                    if (bgMusicRef.current.paused) bgMusicRef.current.play().catch(() => { })
+                } else {
+                    if (!bgMusicRef.current.paused) bgMusicRef.current.pause()
+                }
+            }
+        }
+
     }, [project])
 
     // Animation Loop
@@ -384,6 +412,9 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             isPlayingRef.current = true
             lastTimeRef.current = performance.now()
             requestRef.current = requestAnimationFrame(animate)
+            if (bgMusicRef.current) {
+                bgMusicRef.current.play().catch(e => console.warn("BG play failed", e))
+            }
         } else {
             isPlayingRef.current = false
             // Immediately pause audio and video when stopping
@@ -392,6 +423,9 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             }
             if (videoRef.current && !videoRef.current.paused) {
                 videoRef.current.pause()
+            }
+            if (bgMusicRef.current && !bgMusicRef.current.paused) {
+                bgMusicRef.current.pause()
             }
             if (requestRef.current) {
                 cancelAnimationFrame(requestRef.current)
@@ -402,6 +436,8 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             if (requestRef.current) {
                 cancelAnimationFrame(requestRef.current)
             }
+            // Cleanup BG music on unmount/re-render handled by its own effect, but safe to pause here
+            if (bgMusicRef.current) bgMusicRef.current.pause()
         }
     }, [isPlaying, animate])
 
@@ -438,18 +474,34 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             return
         }
 
-        // Get dimensions from current preview elements if available, otherwise default
-        let width = 1080
-        let height = 1920
+        // Detect aspect ratio based on preview or defaults
+        let baseWidth = 1080
+        let baseHeight = 1920
         if (videoRef.current && videoRef.current.videoWidth) {
-            width = videoRef.current.videoWidth
-            height = videoRef.current.videoHeight
-        } else if (canvasRef.current) {
-            width = canvasRef.current.width
-            height = canvasRef.current.height
+            baseWidth = videoRef.current.videoWidth
+            baseHeight = videoRef.current.videoHeight
         }
 
-        startRender(project, captionSettings, width, height)
+        // FORCE 4K UPSCALE (Vertical 9:16)
+        // If the base is horizontal (e.g. 1920x1080), we might want 4K horizontal (3840x2160).
+        // Let's deduce target 4K based on orientation.
+        const isLandscape = baseWidth > baseHeight
+        const targetWidth = isLandscape ? 3840 : 2160
+        const targetHeight = isLandscape ? 2160 : 3840
+
+        const scaleFactor = targetWidth / baseWidth
+
+        // Scale settings
+        const scaledSettings: CaptionSettings = {
+            ...captionSettings,
+            fontSize: Math.round(captionSettings.fontSize * scaleFactor),
+            shadowSize: Math.round(captionSettings.shadowSize * scaleFactor),
+            paddingTop: captionSettings.paddingTop ? Math.round(captionSettings.paddingTop * scaleFactor) : 0
+        }
+
+        console.log(`Rendering 4K Upscale: ${targetWidth}x${targetHeight} (Scale: ${scaleFactor})`)
+
+        startRender(project, scaledSettings, targetWidth, targetHeight)
     }
 
     const generateAudioForSentence = async (text: string, voiceId: string, speed: number, pitch: number) => {
